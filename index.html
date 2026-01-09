@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ChatGPT 对话查看器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #e8b4b8;
@@ -38,6 +41,8 @@
       --font-size-small: 0.8rem;
       --font-size-xs: 0.75rem;
       --line-height: 1.6;
+      --pattern-color: rgba(232, 180, 184, 0.15);
+      --pattern-color-dark: rgba(232, 180, 184, 0.25);
     }
     [data-theme="brown"] {
       --primary: #b5a191;
@@ -67,6 +72,8 @@
       --avatar-ai-bg: #ffffff;
       --highlight-bg: #f5ecd8;
       --highlight-border: #d4c4a8;
+      --pattern-color: rgba(181, 161, 145, 0.15);
+      --pattern-color-dark: rgba(181, 161, 145, 0.25);
     }
     [data-theme="blue"] {
       --primary: #94A0D3;
@@ -96,6 +103,70 @@
       --avatar-ai-bg: #ffffff;
       --highlight-bg: #e8ebf5;
       --highlight-border: #b8c0e0;
+      --pattern-color: rgba(148, 160, 211, 0.15);
+      --pattern-color-dark: rgba(148, 160, 211, 0.25);
+    }
+    [data-theme="purple"] {
+      --primary: #c4b5d4;
+      --primary-dark: #a594b8;
+      --primary-light: #e8e0f0;
+      --bg: #f9f7fb;
+      --bg-card: #ffffff;
+      --text: #5a5060;
+      --text-light: #8a8090;
+      --border: #e8e0f0;
+      --user-bubble: #c4b5d4;
+      --user-text: #ffffff;
+      --ai-bubble: #f3f0f8;
+      --ai-text: #5a5060;
+      --heat-1: #f5f2f8;
+      --heat-2: #e8e0f0;
+      --heat-3: #d4c8e0;
+      --heat-4: #c4b5d4;
+      --danger: #d47f8a;
+      --danger-light: #faeef0;
+      --system-bg: #f3f0f8;
+      --system-border: #c4b5d4;
+      --system-text: #6a5a70;
+      --memory-bg: #f3f0f8;
+      --memory-border: #c4b5d4;
+      --memory-text: #6a5a70;
+      --avatar-ai-bg: #ffffff;
+      --highlight-bg: #efe8f5;
+      --highlight-border: #d4c8e0;
+      --pattern-color: rgba(196, 181, 212, 0.15);
+      --pattern-color-dark: rgba(196, 181, 212, 0.25);
+    }
+    [data-theme="green"] {
+      --primary: #a8c5a0;
+      --primary-dark: #8fb087;
+      --primary-light: #d8e8d4;
+      --bg: #f6f9f5;
+      --bg-card: #ffffff;
+      --text: #4a5648;
+      --text-light: #7a8a78;
+      --border: #dbe8d8;
+      --user-bubble: #a8c5a0;
+      --user-text: #ffffff;
+      --ai-bubble: #eef4ec;
+      --ai-text: #4a5648;
+      --heat-1: #f0f5ee;
+      --heat-2: #d8e8d4;
+      --heat-3: #b8d4b0;
+      --heat-4: #a8c5a0;
+      --danger: #d47f7f;
+      --danger-light: #faeeee;
+      --system-bg: #eef4ec;
+      --system-border: #a8c5a0;
+      --system-text: #5a6858;
+      --memory-bg: #eef4ec;
+      --memory-border: #a8c5a0;
+      --memory-text: #5a6858;
+      --avatar-ai-bg: #ffffff;
+      --highlight-bg: #e8f0e6;
+      --highlight-border: #c8d8c4;
+      --pattern-color: rgba(168, 197, 160, 0.15);
+      --pattern-color-dark: rgba(168, 197, 160, 0.25);
     }
     [data-theme="dark"] {
       --primary: #7c9db8;
@@ -125,6 +196,8 @@
       --avatar-ai-bg: #3d4a54;
       --highlight-bg: #4a4a30;
       --highlight-border: #6a6a40;
+      --pattern-color: rgba(124, 157, 184, 0.12);
+      --pattern-color-dark: rgba(124, 157, 184, 0.2);
     }
     [data-fontsize="small"] {
       --font-size-base: 0.8rem;
@@ -146,6 +219,7 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
+    .font-decorative { font-family: 'Satisfy', cursive; }
     .icon-svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
     .icon-svg-fill { width: 20px; height: 20px; fill: currentColor; stroke: none; }
     .drawer-menu-item .icon-svg { width: 22px; height: 22px; }
@@ -169,7 +243,7 @@
     .modal-btn.confirm { background: var(--danger); color: white; }
     .modal-btn.primary { background: var(--primary); color: white; }
     .modal-btn:active { transform: scale(0.97); }
-    .settings-panel { background: var(--bg-card); border-radius: 16px; padding: 20px; max-width: 340px; width: 90%; transform: scale(0.9); transition: transform 0.3s; }
+    .settings-panel { background: var(--bg-card); border-radius: 16px; padding: 20px; max-width: 340px; width: 90%; transform: scale(0.9); transition: transform 0.3s; max-height: 85vh; overflow-y: auto; }
     .modal-overlay.show .settings-panel { transform: scale(1); }
     .settings-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; color: var(--text); display: flex; align-items: center; gap: 8px; }
     .settings-section { margin-bottom: 20px; }
@@ -178,28 +252,94 @@
     .settings-input:focus { border-color: var(--primary); }
     .settings-row { display: flex; gap: 12px; }
     .settings-row .settings-field { flex: 1; }
-    .theme-selector { display: flex; gap: 12px; justify-content: center; }
-    .theme-dot { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: all 0.2s; border: 3px solid transparent; position: relative; }
+    .theme-selector { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .theme-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: all 0.2s; border: 3px solid transparent; position: relative; }
     .theme-dot:hover { transform: scale(1.1); }
     .theme-dot.active { border-color: var(--text); }
-    .theme-dot.active::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .theme-dot.active::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
     .theme-dot.pink { background: linear-gradient(135deg, #e8b4b8 0%, #d4a5a5 100%); }
     .theme-dot.brown { background: linear-gradient(135deg, #b5a191 0%, #968272 100%); }
     .theme-dot.blue { background: linear-gradient(135deg, #94A0D3 0%, #7b89c4 100%); }
+    .theme-dot.purple { background: linear-gradient(135deg, #c4b5d4 0%, #a594b8 100%); }
+    .theme-dot.green { background: linear-gradient(135deg, #a8c5a0 0%, #8fb087 100%); }
     .theme-dot.dark { background: linear-gradient(135deg, #3d4a54 0%, #1a1d21 100%); }
     .fontsize-selector { display: flex; gap: 8px; justify-content: center; }
     .fontsize-btn { padding: 8px 16px; border: 2px solid var(--border); border-radius: 20px; background: var(--bg); color: var(--text); font-size: var(--font-size-small); cursor: pointer; transition: all 0.2s; }
     .fontsize-btn:hover { border-color: var(--primary); }
     .fontsize-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
     .settings-buttons { display: flex; gap: 12px; margin-top: 24px; }
-    .header { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    
+    /* 背景图案选择器 */
+    .pattern-selector { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .pattern-option { width: 44px; height: 44px; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); position: relative; overflow: hidden; background: var(--bg-card); }
+    .pattern-option:hover { border-color: var(--primary); transform: scale(1.05); }
+    .pattern-option.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+    .pattern-option.active::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--primary-dark); font-size: 14px; font-weight: bold; z-index: 2; }
+    .pattern-option .pattern-preview { width: 100%; height: 100%; }
+    /* 无背景 */
+    .pattern-option.none .pattern-preview { background: var(--bg); }
+    /* 格纹预览 */
+    .pattern-option.grid .pattern-preview {
+      background-image: 
+        linear-gradient(var(--pattern-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
+      background-size: 8px 8px;
+      background-color: var(--bg);
+    }
+    /* 波点预览 */
+    .pattern-option.dots .pattern-preview {
+      background-image: radial-gradient(var(--pattern-color-dark) 2px, transparent 2px);
+      background-size: 8px 8px;
+      background-position: 0 0, 4px 4px;
+      background-color: var(--bg);
+    }
+    /* 条纹预览 */
+    .pattern-option.stripes .pattern-preview {
+      background-image: repeating-linear-gradient(
+        90deg,
+        var(--pattern-color) 0px,
+        var(--pattern-color) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+      background-color: var(--bg);
+    }
+    /* 自定义背景选项 */
+    .pattern-option.custom .pattern-preview { background: var(--bg); display: flex; align-items: center; justify-content: center; }
+    .pattern-option.custom .pattern-preview svg { width: 20px; height: 20px; stroke: var(--text-light); stroke-width: 1.5; fill: none; }
+    .pattern-option.custom.has-image .pattern-preview { background-size: cover; background-position: center; }
+    .pattern-option.custom.has-image .pattern-preview svg { display: none; }
+    .pattern-option.custom.active.has-image::after { color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    .pattern-option.custom .bg-delete { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: var(--danger); color: white; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; line-height: 1; z-index: 3; }
+    .pattern-option.custom.has-image:hover .bg-delete { display: flex; }
+    .pattern-label { font-size: 0.6rem; text-align: center; margin-top: 2px; color: var(--text-light); }
+    
+    /* 头像上传 */
+    .avatar-upload-section { display: flex; gap: 16px; justify-content: center; }
+    .avatar-upload-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .avatar-upload-preview { width: 56px; height: 56px; border-radius: 50%; border: 2px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: var(--bg); cursor: pointer; transition: all 0.2s; overflow: visible; position: relative; }
+    .avatar-upload-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .avatar-upload-preview:hover { border-color: var(--primary); background: var(--primary-light); }
+    .avatar-upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-upload-preview .avatar-delete { position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; background: var(--danger); color: white; border-radius: 50%; font-size: 12px; display: none; align-items: center; justify-content: center; cursor: pointer; line-height: 1; }
+    .avatar-upload-preview:hover .avatar-delete { display: flex; }
+    .avatar-upload-label { font-size: var(--font-size-xs); color: var(--text-light); }
+    .avatar-upload-input { display: none; }
+    
+    /* Header */
+    .header { 
+      position: fixed; top: 0; left: 0; right: 0; height: 56px; 
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+      display: flex; align-items: center; justify-content: space-between; 
+      padding: 0 12px; z-index: 1000; 
+    }
     .header-left { display: flex; align-items: center; gap: 6px; }
     .header-btn { width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.2); border-radius: 10px; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-weight: 500; }
     .header-btn:hover { background: rgba(255,255,255,0.3); }
     .header-btn:active { transform: scale(0.95); }
     .header-btn .icon-svg { stroke: white; }
-    .header-logo { font-size: 0.95rem; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.1); letter-spacing: 0.5px; white-space: nowrap; }
-    @media (max-width: 380px) { .header-logo { font-size: 0.8rem; } }
+    .header-logo { font-size: 1.1rem; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.1); letter-spacing: 0.5px; white-space: nowrap; }
+    @media (max-width: 380px) { .header-logo { font-size: 0.95rem; } }
     .drawer-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.3s; }
     .drawer-overlay.show { opacity: 1; visibility: visible; }
     .drawer { position: fixed; top: 0; left: 0; width: 300px; max-width: 85vw; height: 100%; background: var(--bg-card); z-index: 1002; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
@@ -239,7 +379,7 @@
     .conv-item:hover .conv-delete-btn { display: flex; }
     .conv-delete-btn:hover { background: var(--danger-light); color: var(--danger); }
     .main-content { padding-top: 56px; min-height: 100vh; background: var(--bg); }
-    .view-upload { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 56px); padding: 20px; }
+    .view-upload { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 64px); padding: 20px; }
     .upload-box { background: var(--bg-card); border-radius: 24px; padding: 50px 40px; text-align: center; border: 3px dashed var(--primary-light); max-width: 400px; width: 100%; transition: all 0.3s; }
     .upload-box.dragover { border-color: var(--primary); background: var(--primary-light); }
     .upload-box .icon { font-size: 4rem; margin-bottom: 16px; }
@@ -249,7 +389,7 @@
     .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232, 180, 184, 0.5); }
     #file-input { display: none; }
     .upload-hint { margin-top: 20px; padding: 12px 16px; background: var(--primary-light); border-radius: 12px; font-size: var(--font-size-small); color: var(--text); }
-    .view-chat { display: none; flex-direction: column; height: calc(100vh - 56px); }
+    .view-chat { display: none; flex-direction: column; height: calc(100vh - 64px); }
     .view-chat.show { display: flex; }
     .chat-header { padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
     .chat-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
@@ -261,11 +401,15 @@
     .collapsible-section.collapsed { height: 0 !important; padding: 0 !important; margin: 0 !important; opacity: 0; }
     .search-section { margin-bottom: 8px; }
     .search-box { position: relative; }
-    .search-box input { width: 100%; padding: 10px 16px 10px 40px; border: 2px solid var(--border); border-radius: 20px; font-size: var(--font-size-base); outline: none; transition: all 0.2s; background: var(--bg); color: var(--text); }
+    .search-box input { width: 100%; padding: 10px 44px 10px 16px; border: 2px solid var(--border); border-radius: 20px; font-size: var(--font-size-base); outline: none; transition: all 0.2s; background: var(--bg); color: var(--text); }
     .search-box input:focus { border-color: var(--primary); background: var(--bg-card); }
     .search-box input::placeholder { color: var(--text-light); }
     .search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
-    .search-mode-toggle { display: flex; gap: 4px; margin-top: 8px; }
+    
+    .search-box .search-submit-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; padding: 6px 8px; border-radius: 10px; font-size: 16px; line-height: 1; color: var(--text-light); transition: all 0.2s; }
+    .search-box .search-submit-btn:hover { background: var(--primary-light); color: var(--primary-dark); }
+    .search-box .search-submit-btn:active { transform: translateY(-50%) scale(0.98); }
+.search-mode-toggle { display: flex; gap: 4px; margin-top: 8px; }
     .search-mode-btn { flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 15px; background: var(--bg); font-size: var(--font-size-xs); cursor: pointer; transition: all 0.2s; color: var(--text); }
     .search-mode-btn:hover { border-color: var(--primary); }
     .search-mode-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -280,9 +424,47 @@
     .timeline-nav.collapsed { display: none !important; }
     .timeline-btn { display: inline-block; padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 15px; font-size: var(--font-size-small); color: var(--text); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
     .timeline-btn:hover { background: var(--primary-light); border-color: var(--primary); }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); }
+    
+    /* 聊天消息区域背景 */
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); position: relative; }
+    
+    /* 背景图案样式 */
+    .chat-messages[data-pattern="grid"] {
+      background-image: 
+        linear-gradient(var(--pattern-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
+      background-size: 12px 12px;
+      background-color: var(--bg);
+    }
+    .chat-messages[data-pattern="dots"] {
+      background-image: 
+        radial-gradient(var(--pattern-color-dark) 4px, transparent 4px),
+        radial-gradient(var(--pattern-color-dark) 4px, transparent 4px);
+      background-size: 28px 28px;
+      background-position: 0 0, 14px 14px;
+      background-color: var(--bg);
+    }
+    .chat-messages[data-pattern="stripes"] {
+      background-image: repeating-linear-gradient(
+        90deg,
+        var(--pattern-color) 0px,
+        var(--pattern-color) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      background-color: var(--bg);
+    }
+    /* 自定义背景图片 - 固定不滚动 */
+    .chat-messages[data-pattern="custom"] {
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+    
     .date-divider { text-align: center; margin: 20px 0; position: relative; }
     .date-divider span { background: var(--bg); padding: 4px 16px; font-size: var(--font-size-small); color: var(--text-light); border-radius: 12px; }
+    .chat-messages[data-pattern] .date-divider span { background: var(--bg-card); }
     .conv-group-title { background: var(--primary-light); padding: 8px 14px; border-radius: 10px; margin: 16px 0 12px; font-size: var(--font-size-small); font-weight: 500; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; }
     .message { display: flex; margin-bottom: 16px; align-items: flex-start; }
     .message.user { flex-direction: row-reverse; }
@@ -300,23 +482,9 @@
     .message.user .message-bubble { background: var(--user-bubble); color: var(--user-text); border-bottom-right-radius: 6px; }
     .message.assistant .message-bubble { background: var(--ai-bubble); color: var(--ai-text); border-bottom-left-radius: 6px; }
     .message.highlight .message-bubble { box-shadow: 0 0 0 3px var(--primary); }
-    
-    /* ★ 关键词高亮样式 - 用于消息气泡内的搜索关键词 */
     .highlight-text { background: var(--highlight-bg); padding: 1px 2px; border-radius: 2px; }
-    .message-bubble .highlight {
-      background: var(--highlight-bg);
-      padding: 2px 4px;
-      border-radius: 3px;
-      border: 1px solid var(--highlight-border);
-      font-weight: 500;
-    }
-    .search-result-preview .highlight { 
-      background: var(--highlight-bg); 
-      padding: 1px 3px; 
-      border-radius: 2px; 
-      font-weight: 500; 
-    }
-    
+    .message-bubble .highlight { background: var(--highlight-bg); padding: 2px 4px; border-radius: 3px; border: 1px solid var(--highlight-border); font-weight: 500; }
+    .search-result-preview .highlight { background: var(--highlight-bg); padding: 1px 3px; border-radius: 2px; font-weight: 500; }
     .message.system .message-bubble { background: var(--system-bg); color: var(--system-text); border: 1px solid var(--system-border); border-bottom-left-radius: 6px; }
     .message.system .message-bubble .system-label { display: inline-block; background: var(--system-border); color: white; padding: 2px 8px; border-radius: 4px; font-size: var(--font-size-xs); margin-bottom: 8px; font-weight: 500; }
     .message.memory .message-bubble { background: var(--memory-bg); color: var(--memory-text); border: 1px solid var(--memory-border); border-bottom-left-radius: 6px; }
@@ -328,7 +496,10 @@
     .star-btn { background: none; border: none; cursor: pointer; font-size: 1rem; opacity: 0.4; transition: all 0.2s; padding: 2px; }
     .star-btn:hover { opacity: 0.8; }
     .star-btn.active { opacity: 1; color: var(--star-active); }
-    .view-global-search { display: none; flex-direction: column; height: calc(100vh - 56px); }
+    .msg-delete-btn { background: none; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0; transition: all 0.2s; padding: 2px 6px; color: var(--text-light); border-radius: 4px; }
+    .message:hover .msg-delete-btn { opacity: 0.5; }
+    .msg-delete-btn:hover { opacity: 1; color: var(--danger); background: var(--danger-light); }
+    .view-global-search { display: none; flex-direction: column; height: calc(100vh - 64px); }
     .view-global-search.show { display: flex; }
     .global-search-header { padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
     .global-search-title { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -343,7 +514,7 @@
     .search-result-count-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 10px; font-size: var(--font-size-xs); font-weight: normal; }
     .search-result-preview { font-size: var(--font-size-small); color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .search-result-meta { font-size: var(--font-size-xs); color: var(--text-light); margin-top: 6px; }
-    .view-favorites { display: none; flex-direction: column; height: calc(100vh - 56px); }
+    .view-favorites { display: none; flex-direction: column; height: calc(100vh - 64px); }
     .view-favorites.show { display: flex; }
     .favorites-header { padding: 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
     .favorites-header .view-title { margin-bottom: 12px; }
@@ -359,16 +530,28 @@
     .fav-msg-checkbox { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 50%; display: none; align-items: center; justify-content: center; flex-shrink: 0; background: white; transition: all 0.2s; font-size: 0.7rem; cursor: pointer; margin-right: 8px; }
     .fav-msg-checkbox.show { display: flex; }
     .fav-msg-checkbox.checked { background: var(--primary); border-color: var(--primary); color: white; }
+    .fav-jump-btn { background: none; border: 1px solid var(--border); border-radius: 12px; padding: 2px 8px; font-size: var(--font-size-xs); color: var(--text-light); cursor: pointer; transition: all 0.2s; margin-left: 8px; }
+    .fav-jump-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
     .view-title { font-size: 1.2rem; font-weight: 500; padding-bottom: 12px; border-bottom: 2px solid var(--primary-light); display: flex; align-items: center; }
     .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
     .empty-state .icon { font-size: 3.5rem; margin-bottom: 12px; }
-    .view-stats { display: none; padding: 16px; overflow-y: auto; height: calc(100vh - 56px); background: var(--bg); }
+    .view-stats { display: none; padding: 16px; overflow-y: auto; height: calc(100vh - 64px); background: var(--bg); }
     .view-stats.show { display: block; }
-    .stats-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .stats-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .month-nav { display: flex; align-items: center; gap: 12px; }
     .month-nav button { background: var(--bg-card); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem; transition: all 0.2s; color: var(--text); }
     .month-nav button:hover { background: var(--primary-light); border-color: var(--primary); }
     .month-nav .month-label { font-size: 1rem; font-weight: 500; min-width: 120px; text-align: center; }
+    /* 图表切换按钮 */
+    .chart-toggle { display: flex; gap: 4px; background: var(--bg); border-radius: 20px; padding: 4px; }
+    .chart-toggle-btn { width: 36px; height: 36px; border: none; background: transparent; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--text-light); }
+    .chart-toggle-btn:hover { color: var(--primary-dark); }
+    .chart-toggle-btn.active { background: var(--primary); color: white; }
+    .chart-toggle-btn svg { width: 18px; height: 18px; }
+    /* 折线图容器 */
+    .line-chart-container { background: var(--bg-card); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: none; max-width: 600px; margin: 0 auto; }
+    .line-chart-container.show { display: block; }
+    .line-chart-canvas { width: 100%; height: 200px; }
     .calendar { background: var(--bg-card); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px; }
     .calendar-weekdays span { text-align: center; font-size: var(--font-size-xs); color: var(--text-light); padding: 8px 0; }
@@ -388,7 +571,72 @@
     .stat-card { background: var(--bg-card); border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     .stat-card .stat-value { font-size: 1.5rem; font-weight: 600; color: var(--primary-dark); }
     .stat-card .stat-label { font-size: var(--font-size-small); color: var(--text-light); margin-top: 4px; }
-    .view-timeline { display: none; padding: 16px; overflow-y: auto; height: calc(100vh - 56px); background: var(--bg); }
+    /* 聊天总览区域 */
+    .chat-overview-section { margin-top: 20px; }
+    .overview-summary { background: var(--bg-card); border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 16px; }
+    .overview-text { font-size: var(--font-size-base); line-height: 1.8; color: var(--text); margin: 0; }
+    .overview-text .highlight-num { color: var(--primary-dark); font-weight: 600; }
+    .overview-actions { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: nowrap; align-items: center; }
+    .overview-action-btn { padding: 8px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; font-size: var(--font-size-xs); cursor: pointer; transition: all 0.2s; color: var(--text); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .overview-action-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+    .random-moment-wrapper { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .random-moment-hint { font-size: var(--font-size-xs); color: var(--primary); opacity: 0.7; font-style: italic; }
+    .overview-rankings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+    @media (max-width: 500px) { .overview-rankings { grid-template-columns: 1fr 1fr; gap: 8px; } }
+    .ranking-card { background: var(--bg-card); border-radius: 12px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .ranking-title { font-size: 0.75rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .ranking-subtitle { font-size: 0.65rem; color: var(--text-light); margin-bottom: 8px; }
+    .ranking-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .ranking-item { display: flex; align-items: center; padding: 5px 6px; background: var(--bg); border-radius: 8px; cursor: pointer; transition: all 0.2s; gap: 4px; }
+    .ranking-item:hover { background: var(--primary-light); transform: translateX(2px); }
+    .ranking-item .rank-num { font-size: 0.65rem; font-weight: 600; color: var(--primary-dark); min-width: 18px; }
+    .ranking-item .rank-info { flex: 1; min-width: 0; }
+    .ranking-item .rank-title { font-size: 0.65rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ranking-item .rank-meta { font-size: 0.6rem; color: var(--text-light); margin-top: 1px; }
+    /* 词云区域 */
+    .wordcloud-section { margin-top: 20px; }
+    .wordcloud-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+    .wordcloud-title { font-size: 1rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .wordcloud-title svg { width: 20px; height: 20px; fill: var(--primary); }
+    .wordcloud-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .wordcloud-filter { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: var(--font-size-xs); background: var(--bg); color: var(--text); outline: none; max-width: 120px; }
+    .wordcloud-filter:focus { border-color: var(--primary); }
+    .blacklist-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); font-size: var(--font-size-xs); cursor: pointer; transition: all 0.2s; color: var(--text); display: flex; align-items: center; gap: 4px; }
+    .blacklist-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+    .wordcloud-block-row { display: flex; align-items: center; gap: 8px; }
+    .wordcloud-checkbox-label { display: flex; align-items: center; gap: 6px; font-size: var(--font-size-xs); color: var(--text); cursor: pointer; padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); transition: all 0.2s; }
+    .wordcloud-checkbox-label:hover { border-color: var(--primary); background: var(--primary-light); }
+    .wordcloud-checkbox-label input[type="checkbox"] { display: none; }
+    .wordcloud-checkbox-label .custom-checkbox { width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 10px; color: white; }
+    .wordcloud-checkbox-label input[type="checkbox"]:checked + .custom-checkbox { background: var(--primary); border-color: var(--primary); }
+    .wordcloud-checkbox-label input[type="checkbox"]:checked + .custom-checkbox::after { content: '✓'; }
+    .wordcloud-container { background: var(--bg-card); border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); min-height: 150px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+    .wordcloud-word { padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s; white-space: nowrap; position: relative; display: inline-flex; align-items: center; gap: 2px; }
+    .wordcloud-word:hover { transform: scale(1.1); opacity: 0.8; }
+    .wordcloud-word .word-delete-btn { display: none; width: 14px; height: 14px; background: var(--danger); color: white; border-radius: 50%; font-size: 10px; line-height: 14px; text-align: center; margin-left: 4px; cursor: pointer; flex-shrink: 0; }
+    .wordcloud-word.show-delete .word-delete-btn { display: inline-block; }
+    .wordcloud-word.show-delete { padding-right: 8px; }
+    .wordcloud-word.size-1 { font-size: 0.75rem; background: var(--heat-1); color: var(--text); }
+    .wordcloud-word.size-2 { font-size: 0.85rem; background: var(--heat-2); color: var(--text); }
+    .wordcloud-word.size-3 { font-size: 1rem; background: var(--heat-3); color: var(--text); font-weight: 500; }
+    .wordcloud-word.size-4 { font-size: 1.15rem; background: var(--heat-4); color: white; font-weight: 500; }
+    .wordcloud-word.size-5 { font-size: 1.3rem; background: var(--primary); color: white; font-weight: 600; }
+    .wordcloud-empty { color: var(--text-light); font-size: var(--font-size-small); }
+    /* 黑名单管理弹窗 */
+    .blacklist-panel { background: var(--bg-card); border-radius: 16px; padding: 20px; max-width: 340px; width: 90%; transform: scale(0.9); transition: transform 0.3s; max-height: 70vh; display: flex; flex-direction: column; }
+    .modal-overlay.show .blacklist-panel { transform: scale(1); }
+    .blacklist-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .blacklist-add { display: flex; gap: 8px; margin-bottom: 16px; }
+    .blacklist-input { flex: 1; padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: var(--font-size-base); outline: none; background: var(--bg); color: var(--text); }
+    .blacklist-input:focus { border-color: var(--primary); }
+    .blacklist-add-btn { padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: var(--font-size-base); transition: all 0.2s; }
+    .blacklist-add-btn:hover { background: var(--primary-dark); }
+    .blacklist-list { flex: 1; overflow-y: auto; max-height: 300px; }
+    .blacklist-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg); border-radius: 8px; margin-bottom: 6px; }
+    .blacklist-item-word { font-size: var(--font-size-base); color: var(--text); }
+    .blacklist-item-delete { width: 24px; height: 24px; border: none; background: transparent; color: var(--danger); cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .blacklist-item-delete:hover { background: var(--danger-light); }
+    .view-timeline { display: none; padding: 16px; overflow-y: auto; height: calc(100vh - 64px); background: var(--bg); }
     .view-timeline.show { display: block; }
     .timeline-list { background: var(--bg-card); border-radius: 16px; overflow: hidden; }
     .timeline-date-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
@@ -396,9 +644,7 @@
     .timeline-date-item:hover { background: var(--bg); }
     .timeline-date-item .date { font-weight: 500; flex: 1; }
     .timeline-date-item .count { font-size: var(--font-size-small); color: var(--text-light); }
-    
-    /* ★ 新增：窗口选择页样式 */
-    .view-conv-select { display: none; flex-direction: column; height: calc(100vh - 56px); }
+    .view-conv-select { display: none; flex-direction: column; height: calc(100vh - 64px); }
     .view-conv-select.show { display: flex; }
     .conv-select-list { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); }
     .conv-select-item { display: flex; align-items: center; padding: 14px 16px; background: var(--bg-card); border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
@@ -409,8 +655,7 @@
     .conv-select-item .conv-name { font-size: var(--font-size-base); font-weight: 500; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .conv-select-item .conv-stats { font-size: var(--font-size-xs); color: var(--text-light); }
     .conv-select-item .conv-arrow { color: var(--text-light); font-size: 1.2rem; }
-    
-    .view-day-messages { display: none; flex-direction: column; height: calc(100vh - 56px); }
+    .view-day-messages { display: none; flex-direction: column; height: calc(100vh - 64px); }
     .view-day-messages.show { display: flex; }
     .day-header { padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
     .day-back-btn { width: 36px; height: 36px; border: none; background: var(--bg); border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--text); }
@@ -418,43 +663,220 @@
     .day-title { flex: 1; }
     .day-title h2 { font-size: 1rem; font-weight: 500; margin-bottom: 2px; }
     .day-title p { font-size: var(--font-size-xs); color: var(--text-light); }
-    .day-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); }
+    .day-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); position: relative; }
+    /* day-messages 背景图案样式 */
+    .day-messages[data-pattern="grid"] {
+      background-image: 
+        linear-gradient(var(--pattern-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--pattern-color) 1px, transparent 1px);
+      background-size: 12px 12px;
+      background-color: var(--bg);
+    }
+    .day-messages[data-pattern="dots"] {
+      background-image: 
+        radial-gradient(var(--pattern-color-dark) 4px, transparent 4px),
+        radial-gradient(var(--pattern-color-dark) 4px, transparent 4px);
+      background-size: 28px 28px;
+      background-position: 0 0, 14px 14px;
+      background-color: var(--bg);
+    }
+    .day-messages[data-pattern="stripes"] {
+      background-image: repeating-linear-gradient(
+        90deg,
+        var(--pattern-color) 0px,
+        var(--pattern-color) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      background-color: var(--bg);
+    }
+    .day-messages[data-pattern="custom"] {
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+    .day-messages[data-pattern] .date-divider span { background: var(--bg-card); }
     .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(92, 77, 77, 0.9); color: white; padding: 12px 24px; border-radius: 25px; font-size: var(--font-size-base); z-index: 9999; opacity: 0; transition: all 0.3s; }
     [data-theme="dark"] .toast { background: rgba(200, 200, 200, 0.9); color: #1a1d21; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    @media (max-width: 480px) { .header-logo { font-size: 0.85rem; } .message-body { max-width: 85%; } .upload-box { padding: 30px 20px; } }
+    .export-format-panel { background: var(--bg-card); border-radius: 16px; padding: 20px; max-width: 300px; width: 90%; transform: scale(0.9); transition: transform 0.3s; }
+    .modal-overlay.show .export-format-panel { transform: scale(1); }
+    .export-format-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--text); text-align: center; }
+    .export-format-options { display: flex; flex-direction: column; gap: 10px; }
+    .export-format-btn { padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg); font-size: var(--font-size-base); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; color: var(--text); }
+    .export-format-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+    .export-format-btn .format-icon { font-size: 1.3rem; }
+    .export-format-btn .format-info { flex: 1; text-align: left; }
+    .export-format-btn .format-name { font-weight: 500; }
+    .export-format-btn .format-desc { font-size: var(--font-size-xs); color: var(--text-light); margin-top: 2px; }
+    @media (max-width: 480px) { .header-logo { font-size: 0.95rem; } .message-body { max-width: 85%; } .upload-box { padding: 30px 20px; } }
   </style>
 </head>
 <body>
   <div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">加载中...</div></div>
   <div class="modal-overlay" id="modal-overlay"><div class="modal"><div class="modal-icon" id="modal-icon">⚠️</div><div class="modal-title" id="modal-title">确认操作</div><div class="modal-message" id="modal-message">确定要执行此操作吗？</div><div class="modal-buttons"><button class="modal-btn confirm" id="modal-confirm-btn" onclick="confirmModalAction()">确定</button><button class="modal-btn cancel" onclick="closeModal()">取消</button></div></div></div>
-  <div class="modal-overlay" id="settings-overlay"><div class="settings-panel"><div class="settings-title"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>设置</div><div class="settings-section"><label class="settings-label">昵称设置</label><div class="settings-row"><div class="settings-field"><input type="text" class="settings-input" id="settings-user-name" placeholder="用户昵称"></div><div class="settings-field"><input type="text" class="settings-input" id="settings-ai-name" placeholder="助手昵称"></div></div></div><div class="settings-section"><label class="settings-label">主题颜色</label><div class="theme-selector"><div class="theme-dot pink active" data-theme="pink" onclick="selectTheme('pink')" title="樱花粉"></div><div class="theme-dot brown" data-theme="brown" onclick="selectTheme('brown')" title="奶茶棕"></div><div class="theme-dot blue" data-theme="blue" onclick="selectTheme('blue')" title="雾霾蓝"></div><div class="theme-dot dark" data-theme="dark" onclick="selectTheme('dark')" title="夜间模式"></div></div></div><div class="settings-section"><label class="settings-label">字体大小</label><div class="fontsize-selector"><button class="fontsize-btn" data-size="small" onclick="selectFontSize('small')">小</button><button class="fontsize-btn active" data-size="medium" onclick="selectFontSize('medium')">中</button><button class="fontsize-btn" data-size="large" onclick="selectFontSize('large')">大</button></div></div><div class="settings-buttons"><button class="modal-btn primary" onclick="saveSettings()">保存</button><button class="modal-btn cancel" onclick="closeSettings()">取消</button></div></div></div>
+  
+  <div class="modal-overlay" id="export-format-overlay">
+    <div class="export-format-panel">
+      <div class="export-format-title">📤 选择导出格式</div>
+      <div class="export-format-options">
+        <button class="export-format-btn" onclick="doExportFavorites('md')">
+          <span class="format-icon">📝</span>
+          <span class="format-info"><div class="format-name">Markdown (.md)</div><div class="format-desc">适合阅读和分享</div></span>
+        </button>
+        <button class="export-format-btn" onclick="doExportFavorites('txt')">
+          <span class="format-icon">📄</span>
+          <span class="format-info"><div class="format-name">纯文本 (.txt)</div><div class="format-desc">简洁纯文字格式</div></span>
+        </button>
+      </div>
+      <div style="margin-top: 16px; text-align: center;"><button class="modal-btn cancel" onclick="closeExportFormatPanel()">取消</button></div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="conv-export-format-overlay">
+    <div class="export-format-panel">
+      <div class="export-format-title">📤 导出对话格式</div>
+      <div class="export-format-options">
+        <button class="export-format-btn" onclick="doExportConversations('json')">
+          <span class="format-icon">📋</span>
+          <span class="format-info"><div class="format-name">JSON (.json)</div><div class="format-desc">完整数据，可重新导入</div></span>
+        </button>
+        <button class="export-format-btn" onclick="doExportConversations('txt')">
+          <span class="format-icon">📄</span>
+          <span class="format-info"><div class="format-name">纯文本 (.txt)</div><div class="format-desc">方便阅读和分享</div></span>
+        </button>
+      </div>
+      <div style="margin-top: 16px; text-align: center;"><button class="modal-btn cancel" onclick="closeConvExportFormatPanel()">取消</button></div>
+    </div>
+  </div>
+  
+  <!-- 黑名单管理弹窗 -->
+  <div class="modal-overlay" id="blacklist-overlay">
+    <div class="blacklist-panel">
+      <div class="blacklist-title">词云黑名单</div>
+      <div class="blacklist-add">
+        <input type="text" class="blacklist-input" id="blacklist-input" placeholder="输入要屏蔽的词...">
+        <button class="blacklist-add-btn" onclick="addToBlacklist()">添加</button>
+      </div>
+      <div class="blacklist-list" id="blacklist-list"></div>
+      <div style="margin-top: 16px; text-align: center;"><button class="modal-btn primary" onclick="closeBlacklistPanel()">完成</button></div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="settings-overlay"><div class="settings-panel"><div class="settings-title"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>设置</div>
+  <div class="settings-section"><label class="settings-label">昵称设置</label><div class="settings-row"><div class="settings-field"><input type="text" class="settings-input" id="settings-user-name" placeholder="用户昵称"></div><div class="settings-field"><input type="text" class="settings-input" id="settings-ai-name" placeholder="助手昵称"></div></div></div>
+  <div class="settings-section"><label class="settings-label">自定义头像</label><div class="avatar-upload-section"><div class="avatar-upload-item"><div class="avatar-upload-preview" id="user-avatar-preview" onclick="document.getElementById('user-avatar-input').click()">🧸<span class="avatar-delete" onclick="event.stopPropagation(); deleteAvatar('user')">×</span></div><span class="avatar-upload-label">用户</span><input type="file" id="user-avatar-input" class="avatar-upload-input" accept="image/*" onchange="handleAvatarUpload(event, 'user')"></div><div class="avatar-upload-item"><div class="avatar-upload-preview" id="ai-avatar-preview" onclick="document.getElementById('ai-avatar-input').click()">🤖<span class="avatar-delete" onclick="event.stopPropagation(); deleteAvatar('ai')">×</span></div><span class="avatar-upload-label">助手</span><input type="file" id="ai-avatar-input" class="avatar-upload-input" accept="image/*" onchange="handleAvatarUpload(event, 'ai')"></div></div></div>
+  <div class="settings-section"><label class="settings-label">主题颜色</label><div class="theme-selector"><div class="theme-dot pink active" data-theme="pink" onclick="selectTheme('pink')" title="樱花粉"></div><div class="theme-dot brown" data-theme="brown" onclick="selectTheme('brown')" title="奶茶棕"></div><div class="theme-dot blue" data-theme="blue" onclick="selectTheme('blue')" title="雾霾蓝"></div><div class="theme-dot purple" data-theme="purple" onclick="selectTheme('purple')" title="香芋紫"></div><div class="theme-dot green" data-theme="green" onclick="selectTheme('green')" title="抹茶绿"></div><div class="theme-dot dark" data-theme="dark" onclick="selectTheme('dark')" title="夜间模式"></div></div></div>
+  <div class="settings-section"><label class="settings-label">聊天背景</label><div class="pattern-selector"><div class="pattern-option none active" data-pattern="none" onclick="selectPattern('none')" title="无"><div class="pattern-preview"></div></div><div class="pattern-option grid" data-pattern="grid" onclick="selectPattern('grid')" title="格纹"><div class="pattern-preview"></div></div><div class="pattern-option dots" data-pattern="dots" onclick="selectPattern('dots')" title="波点"><div class="pattern-preview"></div></div><div class="pattern-option stripes" data-pattern="stripes" onclick="selectPattern('stripes')" title="条纹"><div class="pattern-preview"></div></div><div class="pattern-option custom" data-pattern="custom" onclick="handleCustomBgClick()" title="自定义"><div class="pattern-preview" id="custom-bg-preview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><span class="bg-delete" onclick="event.stopPropagation(); deleteCustomBg()">×</span></div><input type="file" id="bg-upload-input" class="avatar-upload-input" accept="image/*" onchange="handleBgUpload(event)"></div></div>
+  <div class="settings-section"><label class="settings-label">字体大小</label><div class="fontsize-selector"><button class="fontsize-btn" data-size="small" onclick="selectFontSize('small')">小</button><button class="fontsize-btn active" data-size="medium" onclick="selectFontSize('medium')">中</button><button class="fontsize-btn" data-size="large" onclick="selectFontSize('large')">大</button></div></div><div class="settings-buttons"><button class="modal-btn primary" onclick="saveSettings()">保存</button><button class="modal-btn cancel" onclick="closeSettings()">取消</button></div></div></div>
   <div class="toast" id="toast"></div>
-  <header class="header"><div class="header-left"><button class="header-btn" onclick="toggleDrawer()"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button><button class="header-btn" onclick="document.getElementById('file-input').click()"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button></div><div class="header-logo" id="header-logo">ChatGPT 对话查看器</div><input type="file" id="file-input" accept=".json" multiple onchange="handleFileSelect(event)"></header>
+  <header class="header"><div class="header-left"><button class="header-btn" onclick="toggleDrawer()"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button><button class="header-btn" onclick="document.getElementById('file-input').click()"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button></div><div class="header-logo" id="header-logo">GPT Chat Viewer</div><input type="file" id="file-input" accept=".json" multiple onchange="handleFileSelect(event)"></header>
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
   <nav class="drawer" id="drawer"><div class="drawer-header"><h2 id="drawer-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="drawer-title-text">我们的回忆</span></h2><p id="drawer-subtitle">还没有上传对话哦~</p></div><div class="drawer-menu"><div class="drawer-menu-item active" data-view="conversations" onclick="switchView('conversations')"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="label">对话</span></div><div class="drawer-menu-item" data-view="favorites" onclick="switchView('favorites')"><svg class="icon-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="label">收藏</span></div><div class="drawer-menu-item" data-view="stats" onclick="switchView('stats')"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="label">统计</span></div><div class="drawer-menu-item" data-view="timeline" onclick="switchView('timeline')"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="label">时间轴</span></div><div class="drawer-menu-item" onclick="openSettings()"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="label">设置</span></div><div class="drawer-menu-item danger" onclick="showClearDataModal()"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg><span class="label">清除</span></div></div><div class="conv-actions" id="conv-actions"><button class="conv-action-btn" id="select-mode-btn" onclick="toggleSelectMode()">☑ 多选</button><button class="conv-action-btn" id="export-selected-btn" onclick="exportSelectedConversations()" style="display:none;">📤 导出</button><button class="conv-action-btn danger" id="delete-selected-btn" onclick="showDeleteSelectedModal()" style="display:none;">🗑 删除</button></div><div class="conv-search"><input type="text" id="conv-search-input" placeholder="🔍 搜索对话标题..." oninput="filterConversations()"></div><div class="drawer-conversations" id="drawer-conversations"><div class="empty-state"><div class="icon">📭</div><p>上传JSON后这里会显示对话列表~</p></div></div></nav>
   <main class="main-content">
     <div class="view-upload" id="view-upload"><div class="upload-box" id="upload-box"><div class="icon">📁</div><h2>上传你的对话记录</h2><p>拖拽 ChatGPT 导出的 JSON 文件到这里<br>或点击下方按钮选择文件</p><button class="upload-btn" onclick="document.getElementById('file-input').click()">✨ 选择文件</button><div class="upload-hint">💡 支持多次上传，会自动去重合并哦~<br>📝 改名的对话会自动识别并更新</div></div></div>
-    <div class="view-chat" id="view-chat"><div class="chat-header" id="chat-header"><div class="chat-title-row"><div class="chat-title" id="chat-title">对话标题</div><button class="collapse-btn" id="collapse-btn" onclick="toggleHeaderCollapse()" title="折叠/展开">▲</button></div><div class="collapsible-section" id="collapsible-section"><div class="search-section"><div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-input" placeholder="搜索消息内容..."></div><div class="search-mode-toggle"><button class="search-mode-btn active" data-mode="current" onclick="setSearchMode('current')">当前对话</button><button class="search-mode-btn" data-mode="global" onclick="setSearchMode('global')">全部对话</button></div><div class="global-search-info" id="global-search-info"><span class="search-result-count" id="search-result-count">找到 0 条结果</span><div class="search-nav-btns"><button class="search-nav-btn" onclick="navigateSearchResult(-1)">◀ 上一个</button><button class="search-nav-btn" onclick="navigateSearchResult(1)">下一个 ▶</button></div></div></div></div></div><div class="timeline-nav" id="timeline-nav"></div><div class="chat-messages" id="chat-messages"></div></div>
+    <div class="view-chat" id="view-chat"><div class="chat-header" id="chat-header"><div class="chat-title-row"><div class="chat-title" id="chat-title">对话标题</div><button class="collapse-btn" id="collapse-btn" onclick="toggleHeaderCollapse()" title="折叠/展开">▲</button></div><div class="collapsible-section" id="collapsible-section"><div class="search-section"><div class="search-box"><input type="text" id="search-input" placeholder="搜索消息内容..." enterkeyhint="search"><button type="button" id="search-submit" class="search-submit-btn" title="搜索">🔍</button></div><div class="search-mode-toggle"><button class="search-mode-btn active" data-mode="current" onclick="setSearchMode('current')">当前对话</button><button class="search-mode-btn" data-mode="global" onclick="setSearchMode('global')">全部对话</button></div><div class="global-search-info" id="global-search-info"><span class="search-result-count" id="search-result-count">找到 0 条结果</span><div class="search-nav-btns"><button class="search-nav-btn" onclick="navigateSearchResult(-1)">◀ 上一个</button><button class="search-nav-btn" onclick="navigateSearchResult(1)">下一个 ▶</button></div></div></div></div></div><div class="timeline-nav" id="timeline-nav"></div><div class="chat-messages" id="chat-messages"></div></div>
     <div class="view-global-search" id="view-global-search"><div class="global-search-header"><div class="global-search-title"><button class="global-search-back" onclick="exitGlobalSearch()">←</button><h2>🔍 全局搜索结果</h2></div><div class="global-search-stats" id="global-search-stats">搜索中...</div></div><div class="global-search-results" id="global-search-results"><div class="empty-state"><div class="icon">🔍</div><p>输入关键词开始搜索~</p></div></div></div>
-    
-    <!-- ★ 新增：窗口选择页 -->
-    <div class="view-conv-select" id="view-conv-select">
-      <div class="day-header">
-        <button class="day-back-btn" onclick="switchView('timeline')">←</button>
-        <div class="day-title">
-          <h2 id="conv-select-title">2024年1月1日</h2>
-          <p id="conv-select-subtitle">请选择要查看的对话窗口</p>
+    <div class="view-conv-select" id="view-conv-select"><div class="day-header"><button class="day-back-btn" onclick="switchView('timeline')">←</button><div class="day-title"><h2 id="conv-select-title">2024年1月1日</h2><p id="conv-select-subtitle">请选择要查看的对话窗口</p></div></div><div class="conv-select-list" id="conv-select-list"></div></div>
+    <div class="view-day-messages" id="view-day-messages"><div class="day-header"><button class="day-back-btn" onclick="backToConvSelect()">←</button><div class="day-title"><h2 id="day-messages-title">2024年1月1日</h2><p id="day-messages-subtitle">共 0 条消息</p></div></div><div class="day-messages" id="day-messages-container"></div></div>
+    <div class="view-favorites" id="view-favorites"><div class="favorites-header"><h2 class="view-title"><svg class="title-icon-fill" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>收藏的消息</h2><div class="favorites-actions"><button class="fav-action-btn" id="fav-select-btn" onclick="toggleFavSelectMode()">☑ 多选</button><button class="fav-action-btn" id="fav-select-all-btn" onclick="selectAllFavorites()" style="display:none;">全选</button><button class="fav-action-btn danger" id="fav-unfav-all-btn" onclick="unfavoriteSelected()" style="display:none;">🗑 取消收藏</button><button class="fav-action-btn export" id="fav-export-btn" onclick="showExportFormatPanel()" style="display:none;">📤 导出选中</button></div></div><div class="favorites-list" id="favorites-list"><div class="empty-state"><div class="icon">⭐</div><p>还没有收藏任何消息~<br>在聊天中点击☆来收藏吧</p></div></div></div>
+    <div class="view-stats" id="view-stats">
+      <h2 class="view-title"><svg class="title-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>聊天统计</h2>
+      <div class="stats-header">
+        <div class="month-nav">
+          <button onclick="changeMonth(-1)">◀</button>
+          <span class="month-label" id="month-label">2024年1月</span>
+          <button onclick="changeMonth(1)">▶</button>
+        </div>
+        <div class="chart-toggle">
+          <button class="chart-toggle-btn active" id="heatmap-btn" onclick="setChartMode('heatmap')" title="热力图">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="chart-toggle-btn" id="linechart-btn" onclick="setChartMode('linechart')" title="折线图">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
+          <button class="chart-toggle-btn" id="yearchart-btn" onclick="setChartMode('year')" title="年度统计">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="4" height="10"/><rect x="10" y="5" width="4" height="15"/><rect x="17" y="8" width="4" height="12"/></svg>
+          </button>
         </div>
       </div>
-      <div class="conv-select-list" id="conv-select-list"></div>
+      <div class="calendar" id="calendar-container">
+        <div class="calendar-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+        <div class="calendar-days" id="calendar-days"></div>
+      </div>
+      <div class="line-chart-container" id="line-chart-container">
+        <canvas class="line-chart-canvas" id="line-chart-canvas"></canvas>
+      </div>
+      <div class="line-chart-container" id="year-chart-container">
+        <canvas class="line-chart-canvas" id="year-chart-canvas"></canvas>
+      </div>
+      <div class="stats-summary">
+        <div class="stat-card"><div class="stat-value" id="stat-total-words">0</div><div class="stat-label">本月总字数</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-total-days">0</div><div class="stat-label">聊天天数</div></div>
+      </div>
+      <!-- 聊天总览区域 -->
+      <div class="chat-overview-section">
+        <div class="overview-summary" id="overview-summary">
+          <p class="overview-text" id="overview-text">加载中...</p>
+        </div>
+        <div class="overview-actions">
+          <div class="random-moment-wrapper">
+            <button class="overview-action-btn" onclick="randomJumpToMoment()">🎲 随机带我回某一刻</button>
+            <span class="random-moment-hint">那一刻我们在想什么呢 ♡</span>
+          </div>
+        </div>
+        <div class="overview-rankings">
+          <div class="ranking-card">
+            <div class="ranking-title">最用力的 Top 10 日</div>
+            <div class="ranking-subtitle">这些是我们说得最多的日子</div>
+            <div class="ranking-list" id="top-days-list"></div>
+          </div>
+          <div class="ranking-card">
+            <div class="ranking-title">最长的 Top 10 对话</div>
+            <div class="ranking-subtitle">这些是我们最舍不得停下来的对话</div>
+            <div class="ranking-list" id="top-convs-list"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 词云区域 -->
+      <div class="wordcloud-section">
+        <div class="wordcloud-header">
+          <div class="wordcloud-title">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+            高频词云
+          </div>
+          <div class="wordcloud-actions">
+            <select class="wordcloud-filter" id="wordcloud-conv-filter" onchange="renderWordCloud()">
+              <option value="all">全部窗口</option>
+            </select>
+            <select class="wordcloud-filter" id="wordcloud-date-filter" onchange="renderWordCloud()">
+              <option value="all" selected>全部时间</option>
+              <option value="month">当前月份</option>
+            </select>
+            <select class="wordcloud-filter" id="wordcloud-role-filter" onchange="renderWordCloud()">
+              <option value="all" selected>全部角色</option>
+              <option value="user">仅用户</option>
+              <option value="assistant">仅助手</option>
+            </select>
+            <div class="wordcloud-block-row">
+              <label class="wordcloud-checkbox-label">
+                <input type="checkbox" id="wordcloud-hide-english" onchange="renderWordCloud()">
+                <span class="custom-checkbox"></span>
+                <span>屏蔽英文</span>
+              </label>
+              <button class="blacklist-btn" onclick="openBlacklistPanel()">黑名单</button>
+            </div>
+          </div>
+        </div>
+        <div class="wordcloud-container" id="wordcloud-container">
+          <span class="wordcloud-empty">加载中...</span>
+        </div>
+      </div>
     </div>
-    
-    <div class="view-day-messages" id="view-day-messages"><div class="day-header"><button class="day-back-btn" onclick="backToConvSelect()">←</button><div class="day-title"><h2 id="day-messages-title">2024年1月1日</h2><p id="day-messages-subtitle">共 0 条消息</p></div></div><div class="day-messages" id="day-messages-container"></div></div>
-    <div class="view-favorites" id="view-favorites"><div class="favorites-header"><h2 class="view-title"><svg class="title-icon-fill" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>收藏的消息</h2><div class="favorites-actions"><button class="fav-action-btn" id="fav-select-btn" onclick="toggleFavSelectMode()">☑ 多选</button><button class="fav-action-btn" id="fav-select-all-btn" onclick="selectAllFavorites()" style="display:none;">全选</button><button class="fav-action-btn danger" id="fav-unfav-all-btn" onclick="unfavoriteSelected()" style="display:none;">🗑 取消收藏</button><button class="fav-action-btn export" id="fav-export-btn" onclick="exportSelectedFavorites()" style="display:none;">📤 导出选中</button></div></div><div class="favorites-list" id="favorites-list"><div class="empty-state"><div class="icon">⭐</div><p>还没有收藏任何消息~<br>在聊天中点击☆来收藏吧</p></div></div></div>
-    <div class="view-stats" id="view-stats"><h2 class="view-title"><svg class="title-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>聊天统计</h2><div class="stats-header"><div class="month-nav"><button onclick="changeMonth(-1)">◀</button><span class="month-label" id="month-label">2024年1月</span><button onclick="changeMonth(1)">▶</button></div></div><div class="calendar"><div class="calendar-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-days" id="calendar-days"></div></div><div class="stats-summary"><div class="stat-card"><div class="stat-value" id="stat-total-words">0</div><div class="stat-label">本月总字数</div></div><div class="stat-card"><div class="stat-value" id="stat-total-days">0</div><div class="stat-label">聊天天数</div></div></div></div>
     <div class="view-timeline" id="view-timeline"><h2 class="view-title"><svg class="title-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>按日期跳转</h2><div class="timeline-list" id="timeline-list"></div></div>
   </main>
+  
   <script>
     const DB_NAME = 'QithMiaoMiaoLogs';
     const DB_VERSION = 2;
@@ -475,114 +897,377 @@
     async function saveConversationToDb(conv) { return new Promise((resolve, reject) => { const t = db.transaction(['conversations'], 'readwrite'); const s = t.objectStore('conversations'); const r = s.put(conv); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
     async function deleteConversationFromDb(convId) { return new Promise((resolve, reject) => { const t = db.transaction(['conversations'], 'readwrite'); const s = t.objectStore('conversations'); const r = s.delete(convId); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
     async function getAllConversationsFromDb() { return new Promise((resolve, reject) => { const t = db.transaction(['conversations'], 'readonly'); const s = t.objectStore('conversations'); const r = s.getAll(); r.onsuccess = () => resolve(r.result || []); r.onerror = () => reject(r.error); }); }
-    async function saveFavoriteToDb(msgId) { return new Promise((resolve, reject) => { const t = db.transaction(['favorites'], 'readwrite'); const s = t.objectStore('favorites'); const r = s.put({ id: msgId }); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
+    async function saveFavoriteToDb(msgId, convId) { return new Promise((resolve, reject) => { const t = db.transaction(['favorites'], 'readwrite'); const s = t.objectStore('favorites'); const r = s.put({ id: msgId, convId: convId }); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
     async function removeFavoriteFromDb(msgId) { return new Promise((resolve, reject) => { const t = db.transaction(['favorites'], 'readwrite'); const s = t.objectStore('favorites'); const r = s.delete(msgId); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
-    async function getAllFavoritesFromDb() { return new Promise((resolve, reject) => { const t = db.transaction(['favorites'], 'readonly'); const s = t.objectStore('favorites'); const r = s.getAll(); r.onsuccess = () => { const results = r.result || []; resolve(new Set(results.map(x => x.id))); }; r.onerror = () => reject(r.error); }); }
+    async function getAllFavoritesFromDb() { return new Promise((resolve, reject) => { const t = db.transaction(['favorites'], 'readonly'); const s = t.objectStore('favorites'); const r = s.getAll(); r.onsuccess = () => { const results = r.result || []; const favMap = new Map(); results.forEach(x => favMap.set(x.id, x.convId || null)); resolve(favMap); }; r.onerror = () => reject(r.error); }); }
     async function clearAllDataFromDb() { return new Promise((resolve, reject) => { const t = db.transaction(['conversations', 'favorites', 'metadata'], 'readwrite'); t.objectStore('conversations').clear(); t.objectStore('favorites').clear(); t.objectStore('metadata').clear(); t.oncomplete = () => resolve(); t.onerror = () => reject(t.error); }); }
 
-    let allConversations = [], filteredConversations = [], conversationStats = {}, currentConvIndex = -1, currentConvId = null, currentMessages = [], allMessages = [], messagesByDate = {}, favorites = new Set(), statsByDate = {};
+    let allConversations = [], filteredConversations = [], conversationStats = {}, currentConvIndex = -1, currentConvId = null, currentMessages = [], allMessages = [], messagesByDate = {}, favorites = new Map(), statsByDate = {};
     let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
     let isSelectMode = false, selectedConvIds = new Set(), isFavSelectMode = false, selectedFavMsgIds = new Set(), modalConfirmCallback = null;
     let searchMode = 'current', globalSearchResults = [], currentSearchResultIndex = -1, flatSearchResults = [], isHeaderCollapsed = false;
-    let appSettings = { userName: '', aiName: '', theme: 'pink', fontSize: 'medium' };
-    
-    // ★ 用于保存搜索关键词和IME输入状态
+    let appSettings = { userName: '', aiName: '', theme: 'pink', fontSize: 'medium', pattern: 'none', userAvatar: '', aiAvatar: '', customBg: '' };
     let currentSearchKeyword = '';
     let isComposing = false;
+    let chartMode = 'heatmap';
+    let monthStatsCache = {}; // 月份统计缓存，key格式：YYYY-MM
+    let wordcloudBlacklist = [];
+    let wordDict = new Set(); // 分词词典
+    let dictLoaded = false;
+    
+    // 加载分词词典
+    async function loadWordDict() {
+      try {
+        // 尝试从相对路径加载词典
+        const response = await fetch('dict/words.json');
+        if (response.ok) {
+          const data = await response.json();
+          wordDict = new Set(data.words || []);
+          dictLoaded = true;
+          console.log(`词典加载成功，共 ${wordDict.size} 个词`);
+        }
+      } catch (e) {
+        console.log('词典加载失败，使用简单分词模式', e);
+        dictLoaded = false;
+      }
+    }
+
+    // 停用词表
+    const STOPWORDS = new Set([
+      // 基础代词
+      '我', '你', '他', '她', '它', '我们', '你们', '他们', '她们', '它们', '自己', '别人', '大家', '这', '那', '这个', '那个', '这些', '那些', '这里', '那里', '哪', '哪个', '哪些', '哪里', '谁', '什么', '怎么', '怎样', '如何', '多少', '几', '某', '每', '各',
+      // 助词语气词
+      '的', '地', '得', '了', '着', '过', '吗', '呢', '吧', '啊', '呀', '哇', '哦', '噢', '嗯', '唉', '哎', '啦', '喽', '嘛', '咯', '罢了', '而已', '而且', '并且',
+      // 连词介词
+      '和', '与', '及', '或', '或者', '但', '但是', '然而', '可是', '不过', '虽然', '虽', '尽管', '即使', '如果', '假如', '要是', '除非', '因为', '由于', '所以', '因此', '于是', '那么', '则', '就', '便', '才', '又', '也', '还', '再', '都', '只', '仅', '光', '单', '净', '全', '总', '老', '一直', '始终', '已经', '曾经', '正在', '将要', '快要', '刚刚', '刚', '立刻', '马上', '终于', '竟然', '居然', '简直', '几乎', '差点', '大概', '也许', '可能', '应该', '必须', '需要', '可以', '能够', '能', '会', '要', '想', '愿意', '肯', '敢', '在', '从', '到', '向', '往', '朝', '对', '跟', '同', '给', '为', '被', '把', '让', '叫', '使', '比', '按', '照', '根据', '关于', '至于', '对于', '除了', '除', '以', '用', '以便', '以免', '为了',
+      // 程度副词
+      '很', '太', '极', '非常', '十分', '特别', '相当', '比较', '更', '最', '越', '稍微', '略', '有点', '不', '没', '没有', '别', '甭', '勿', '未', '无', '非', '真', '真的', '确实', '实在', '其实', '事实上', '当然', '自然', '果然', '毕竟', '究竟', '到底', '反正', '反而', '倒', '偏偏', '恰恰', '恰好', '正好', '刚好',
+      // 数量词
+      '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千', '万', '亿', '第', '个', '只', '条', '件', '本', '张', '把', '次', '遍', '回', '趟', '下', '番', '种', '样', '些', '点', '块',
+      // 时间词
+      '年', '月', '日', '号', '时', '分', '秒', '天', '周', '星期', '今天', '明天', '昨天', '现在', '刚才', '以前', '以后', '之前', '之后', '当时', '那时', '这时', '早', '晚', '上午', '下午', '中午', '晚上', '白天', '夜里', '时候', '的时候',
+      // 方位词
+      '上', '下', '左', '右', '前', '后', '里', '外', '内', '中', '旁', '边', '面', '头', '底', '东', '西', '南', '北', '里面', '外面', '上面', '下面', '前面', '后面', '旁边', '中间',
+      // 语气词感叹词
+      '哈哈', '哈哈哈', '哈哈哈哈', '嘿嘿', '呵呵', '嗯嗯', '好的', '好吧', '行', '额', '诶', '唔', '呃', '喔', '就是', '然后', '不是', '嘻嘻', '呜呜', '嗷', '噗', '啧', '嘶', '欸',
+      // 基础动词
+      '是', '有', '在', '说', '看', '想', '知道', '觉得', '认为', '感觉', '希望', '喜欢', '需要', '做', '去', '来', '走', '跑', '站', '坐', '起来', '出来', '进去', '回去', '过来', '过去', '下来', '上去', '进来', '出去',
+      // 常见口语短语 - 代词+动词组合
+      '你说', '我说', '他说', '她说', '你是', '我是', '他是', '她是', '是你', '是我', '是他', '是她', '你的', '我的', '他的', '她的',
+      '你在', '我在', '你有', '我有', '你能', '我能', '你会', '我会', '你要', '我要', '你想', '我想', '你看', '我看',
+      '你知道', '我知道', '你觉得', '我觉得', '你以为', '我以为', '你认为', '我认为', '你喜欢', '我喜欢',
+      '你知道我', '我知道你', '你知道你', '我知道我', '你以为我', '我以为你', '你以为你', '我以为我',
+      '你不是', '我不是', '他不是', '她不是', '不是你', '不是我', '不是他', '不是她',
+      '你不是在', '我不是在', '你不是不', '我不是不', '你不是说', '我不是说',
+      '你不要', '我不要', '你不能', '我不能', '你不会', '我不会', '你不想', '我不想',
+      '你不需要', '我不需要', '你需要', '我需要',
+      // 疑问/反问短语
+      '是不是', '好不好', '行不行', '对不对', '要不要', '能不能', '会不会', '可不可以',
+      '你是不是', '我是不是', '他是不是', '她是不是',
+      '是因为', '不是因为', '是因为你', '是因为我', '不是因为你', '不是因为我',
+      // 常见短语结构
+      '的人', '的话', '的样子', '的感觉', '的意思', '的事', '的事情', '的问题', '的原因', '的结果',
+      '一下', '一点', '一句', '一个', '一些', '一起', '一样', '一般', '一定', '一直',
+      '那种', '这种', '什么样', '怎么样', '那样', '这样', '一样的',
+      '比如', '比如说', '例如', '就像', '好像', '似乎', '仿佛',
+      '而是', '还是', '就是', '只是', '不只是', '不仅是', '也是', '都是', '全是',
+      '着你', '着我', '给你', '给我', '对你', '对我', '跟你', '跟我', '和你', '和我',
+      '你一', '我一', '你这', '我这', '你那', '我那',
+      '一句话', '你一句', '我一句', '每一下', '每一次', '每一个', '每一天',
+      '来了', '去了', '走了', '回来', '回去', '过来', '过去', '起来', '下去',
+      '地方', '时间', '东西', '事情', '问题', '情况', '方面', '方式', '方法',
+      '怎么办', '怎么说', '怎么做', '怎么回事', '怎么了', '怎么会',
+      '为什么', '是什么', '做什么', '说什么', '想什么', '干什么',
+      '我就', '你就', '就我', '就你', '我就是', '你就是', '我就知道', '你就知道',
+      '我现在', '你现在', '我现在就', '你现在就',
+      '你是我', '我是你', '你是我的', '我是你的',
+      '不行', '不好', '不对', '不能', '不会', '不想', '不要', '不用', '不必',
+      '可以', '可能', '可是', '可以吗', '可以的', '可不可以',
+      '好了', '行了', '算了', '得了', '够了', '完了', '好啦', '行啦',
+      '那个', '这个', '哪个', '某个', '每个', '另一个', '下一个', '上一个',
+      '另一', '其他', '别的', '其它', '另外',
+      '只手', '只眼', '只脚', '另一只', '另一只手',
+      '怀里', '手里', '心里', '眼里', '脑子里', '嘴里',
+      '情绪', '感情', '心情', '状态',
+      '小姐', '先生', '同学', '朋友', '老师',
+      // 英文停用词
+      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'and', 'but', 'if', 'or', 'because', 'until', 'while', 'although', 'though', 'this', 'that', 'these', 'those', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'am', 'about', 'like', 'just', 'know', 'think', 'want', 'see', 'come', 'go', 'get', 'make', 'say', 'tell', 'ask', 'use', 'find', 'give', 'take', 'need', 'feel', 'try', 'let', 'put', 'mean', 'keep', 'begin', 'seem', 'help', 'show', 'hear', 'play', 'run', 'move', 'live', 'believe', 'hold', 'bring', 'happen', 'write', 'provide', 'sit', 'stand', 'lose', 'pay', 'meet', 'include', 'continue', 'set', 'learn', 'change', 'lead', 'understand', 'watch', 'follow', 'stop', 'create', 'speak', 'read', 'allow', 'add', 'spend', 'grow', 'open', 'walk', 'win', 'offer', 'remember', 'love', 'consider', 'appear', 'buy', 'wait', 'serve', 'die', 'send', 'expect', 'build', 'stay', 'fall', 'cut', 'reach', 'kill', 'remain', 'yeah', 'yes', 'okay', 'ok', 'oh', 'um', 'uh', 'well', 'like', 'really', 'actually', 'basically', 'literally', 'honestly', 'seriously'
+    ]);
 
     document.addEventListener('DOMContentLoaded', async () => {
       showLoading('正在初始化...');
-      try { loadSettings(); applySettings(); await openDatabase(); await loadFromDatabase(); setupDragDrop(); setupSearchInput(); } catch (e) { console.error('初始化失败', e); showToast('初始化失败，请刷新重试'); }
+      try { loadSettings(); loadBlacklist(); applySettings(); await loadWordDict(); await openDatabase(); await loadFromDatabase(); setupDragDrop(); setupSearchInput(); } catch (e) { console.error('初始化失败', e); showToast('初始化失败，请刷新重试'); }
       hideLoading();
     });
 
-    // ★ 设置搜索输入框的事件监听（修复IME问题）
+    // 黑名单管理
+    function loadBlacklist() { try { const saved = localStorage.getItem('wordcloudBlacklist'); if (saved) wordcloudBlacklist = JSON.parse(saved); } catch (e) { console.error('加载黑名单失败', e); } }
+    function saveBlacklist() { try { localStorage.setItem('wordcloudBlacklist', JSON.stringify(wordcloudBlacklist)); } catch (e) { console.error('保存黑名单失败', e); } }
+    function openBlacklistPanel() { renderBlacklistList(); document.getElementById('blacklist-overlay').classList.add('show'); }
+    function closeBlacklistPanel() { document.getElementById('blacklist-overlay').classList.remove('show'); renderWordCloud(); }
+    function addToBlacklist(word) {
+      const input = document.getElementById('blacklist-input');
+      const wordToAdd = word || (input ? input.value.trim() : '');
+      if (!wordToAdd) return;
+      if (!wordcloudBlacklist.includes(wordToAdd)) {
+        wordcloudBlacklist.push(wordToAdd);
+        saveBlacklist();
+        renderBlacklistList();
+        if (input && !word) input.value = '';
+        showToast(`已将"${wordToAdd}"加入黑名单`);
+      }
+    }
+    function removeFromBlacklist(word) { wordcloudBlacklist = wordcloudBlacklist.filter(w => w !== word); saveBlacklist(); renderBlacklistList(); }
+    
+    // 词云二次确认删除
+    function toggleWordDeleteBtn(element) {
+      // 先移除其他词的删除按钮
+      document.querySelectorAll('.wordcloud-word.show-delete').forEach(el => {
+        if (el !== element) el.classList.remove('show-delete');
+      });
+      // 切换当前词的删除按钮显示状态
+      element.classList.toggle('show-delete');
+    }
+    function confirmAddToBlacklist(word, element) {
+      if (!wordcloudBlacklist.includes(word)) {
+        wordcloudBlacklist.push(word);
+        saveBlacklist();
+        showToast(`已将"${word}"加入黑名单`);
+      }
+      // 直接从界面移除该词条
+      if (element) {
+        element.remove();
+      }
+    }
+    
+    function renderBlacklistList() {
+      const container = document.getElementById('blacklist-list');
+      if (!container) return;
+      if (wordcloudBlacklist.length === 0) { container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light);font-size:var(--font-size-small);">黑名单为空<br>点击词云中的词，再点×可添加</div>'; return; }
+      container.innerHTML = wordcloudBlacklist.map(word => `<div class="blacklist-item"><span class="blacklist-item-word">${escapeHtml(word)}</span><button class="blacklist-item-delete" onclick="removeFromBlacklist('${escapeJsString(word)}')">×</button></div>`).join('');
+    }
+
     function setupSearchInput() {
       const searchInput = document.getElementById('search-input');
+      const searchBtn = document.getElementById('search-submit');
       if (!searchInput) return;
-      
-      // 监听IME组合开始
-      searchInput.addEventListener('compositionstart', () => {
-        isComposing = true;
-      });
-      
-      // 监听IME组合结束
-      searchInput.addEventListener('compositionend', (e) => {
-        isComposing = false;
-        // 组合结束后触发搜索
-        handleSearch();
-      });
-      
-      // 监听输入事件
-      searchInput.addEventListener('input', (e) => {
-        // 如果正在IME组合中，不触发搜索
+      // 不在每次输入时自动跳转；改为：按 Enter 或点 🔍 才执行搜索
+      searchInput.addEventListener('compositionstart', () => { isComposing = true; });
+      searchInput.addEventListener('compositionend', () => { isComposing = false; });
+      // 允许“清空关键词”时自动回到正常视图，但不在输入过程中自动跳转
+      searchInput.addEventListener('input', () => {
         if (isComposing) return;
-        handleSearch();
+        if (searchInput.value.trim() === '') handleSearch();
       });
+      searchInput.addEventListener('keydown', (e) => {
+        if (isComposing) return;
+        if (e.key === 'Enter') { e.preventDefault(); handleSearch(); }
+      });
+      if (searchBtn) {
+        searchBtn.addEventListener('click', () => { if (isComposing) return; handleSearch(); });
+      }
     }
 
     function loadSettings() { try { const saved = localStorage.getItem('chatLogViewerSettings'); if (saved) appSettings = { ...appSettings, ...JSON.parse(saved) }; } catch (e) { console.error('加载设置失败', e); } }
     function saveSettingsToStorage() { try { localStorage.setItem('chatLogViewerSettings', JSON.stringify(appSettings)); } catch (e) { console.error('保存设置失败', e); } }
+    function saveLastViewedConv(convId) { try { localStorage.setItem('lastViewedConvId', convId); } catch (e) { console.error('保存上次对话失败', e); } }
+    function getLastViewedConv() { try { return localStorage.getItem('lastViewedConvId'); } catch (e) { return null; } }
+    
     function applySettings() {
       if (appSettings.theme === 'pink') document.body.removeAttribute('data-theme'); else document.body.setAttribute('data-theme', appSettings.theme);
       if (appSettings.fontSize === 'medium') document.body.removeAttribute('data-fontsize'); else document.body.setAttribute('data-fontsize', appSettings.fontSize);
+      applyPattern();
       updateHeaderLogo(); updatePageTitle();
     }
+    
+    function applyPattern() {
+      const chatMessages = document.getElementById('chat-messages');
+      const dayMessages = document.getElementById('day-messages-container');
+      [chatMessages, dayMessages].forEach(container => {
+        if (!container) return;
+        if (appSettings.pattern === 'none') {
+          container.removeAttribute('data-pattern');
+          container.style.backgroundImage = '';
+        } else if (appSettings.pattern === 'custom' && appSettings.customBg) {
+          container.setAttribute('data-pattern', 'custom');
+          container.style.backgroundImage = `url(${appSettings.customBg})`;
+        } else {
+          container.setAttribute('data-pattern', appSettings.pattern);
+          container.style.backgroundImage = '';
+        }
+      });
+    }
+    
+    function handleBgUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxSize = 1920;
+          let width = img.width, height = img.height;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) { height *= maxSize / width; width = maxSize; }
+            else { width *= maxSize / height; height = maxSize; }
+          }
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const base64 = canvas.toDataURL('image/jpeg', 0.85);
+          
+          appSettings.customBg = base64;
+          appSettings.pattern = 'custom';
+          updateCustomBgPreview();
+          document.querySelectorAll('.pattern-option').forEach(p => p.classList.toggle('active', p.dataset.pattern === 'custom'));
+          applyPattern();
+          showToast('背景已设置');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+    
+    function updateCustomBgPreview() {
+      const preview = document.getElementById('custom-bg-preview');
+      const option = preview?.parentElement;
+      if (!preview || !option) return;
+      if (appSettings.customBg) {
+        preview.style.backgroundImage = `url(${appSettings.customBg})`;
+        option.classList.add('has-image');
+      } else {
+        preview.style.backgroundImage = '';
+        option.classList.remove('has-image');
+      }
+    }
+    
+    function selectPattern(pattern) {
+      document.querySelectorAll('.pattern-option').forEach(p => p.classList.toggle('active', p.dataset.pattern === pattern));
+      appSettings.pattern = pattern;
+      applyPattern();
+    }
+    
+    function handleCustomBgClick() {
+      if (appSettings.customBg) {
+        selectPattern('custom');
+      } else {
+        document.getElementById('bg-upload-input').click();
+      }
+    }
+    
+    function deleteCustomBg() {
+      appSettings.customBg = '';
+      if (appSettings.pattern === 'custom') {
+        appSettings.pattern = 'none';
+        document.querySelectorAll('.pattern-option').forEach(p => p.classList.toggle('active', p.dataset.pattern === 'none'));
+      }
+      updateCustomBgPreview();
+      applyPattern();
+    }
+    
+    function hasChinese(str) { return /[\u4e00-\u9fa5]/.test(str); }
+    
     function updateHeaderLogo() {
       const logo = document.getElementById('header-logo'), dt = document.getElementById('drawer-title-text');
-      if (appSettings.userName && appSettings.aiName) { logo.textContent = `${appSettings.userName} & ${appSettings.aiName} Logs`; dt.textContent = `${appSettings.userName} & ${appSettings.aiName}`; }
-      else if (appSettings.userName) { logo.textContent = `${appSettings.userName}'s Chat Logs`; dt.textContent = `${appSettings.userName}的回忆`; }
-      else if (appSettings.aiName) { logo.textContent = `${appSettings.aiName} Chat Logs`; dt.textContent = `与${appSettings.aiName}的回忆`; }
-      else { logo.textContent = 'ChatGPT 对话查看器'; dt.textContent = '我们的回忆'; }
+      const un = appSettings.userName, an = appSettings.aiName;
+      
+      if (un && an) {
+        const hasChineseChar = hasChinese(un) || hasChinese(an);
+        if (hasChineseChar) {
+          logo.innerHTML = `${escapeHtml(an)} & ${escapeHtml(un)} Logs`;
+          logo.classList.remove('font-decorative');
+          dt.innerHTML = `${escapeHtml(an)} & ${escapeHtml(un)}`;
+          dt.classList.remove('font-decorative');
+        } else {
+          logo.innerHTML = `<span class="font-decorative">${escapeHtml(an)} & ${escapeHtml(un)} Logs</span>`;
+          dt.innerHTML = `<span class="font-decorative">${escapeHtml(an)} & ${escapeHtml(un)}</span>`;
+        }
+      } else if (un) {
+        const hasChineseChar = hasChinese(un);
+        if (hasChineseChar) {
+          logo.innerHTML = `${escapeHtml(un)}的聊天记录`;
+          logo.classList.remove('font-decorative');
+          dt.innerHTML = `${escapeHtml(un)}的回忆`;
+        } else {
+          logo.innerHTML = `<span class="font-decorative">${escapeHtml(un)}'s Logs</span>`;
+          dt.innerHTML = `<span class="font-decorative">${escapeHtml(un)}'s Memories</span>`;
+        }
+      } else if (an) {
+        const hasChineseChar = hasChinese(an);
+        if (hasChineseChar) {
+          logo.innerHTML = `${escapeHtml(an)} 聊天记录`;
+          logo.classList.remove('font-decorative');
+          dt.innerHTML = `与${escapeHtml(an)}的回忆`;
+        } else {
+          logo.innerHTML = `<span class="font-decorative">${escapeHtml(an)} Logs</span>`;
+          dt.innerHTML = `<span class="font-decorative">${escapeHtml(an)} Memories</span>`;
+        }
+      } else {
+        logo.innerHTML = `<span class="font-decorative">GPT Chat Viewer</span>`;
+        dt.textContent = '我们的回忆';
+        dt.classList.remove('font-decorative');
+      }
     }
-    function updatePageTitle() { document.title = (appSettings.userName && appSettings.aiName) ? `${appSettings.userName} & ${appSettings.aiName} Logs` : 'ChatGPT 对话查看器'; }
+    
+    function updatePageTitle() { document.title = (appSettings.userName && appSettings.aiName) ? `${appSettings.aiName} & ${appSettings.userName}` : 'ChatGPT 对话查看器'; }
     function openSettings() {
       document.getElementById('settings-user-name').value = appSettings.userName;
       document.getElementById('settings-ai-name').value = appSettings.aiName;
       document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === appSettings.theme));
       document.querySelectorAll('.fontsize-btn').forEach(b => b.classList.toggle('active', b.dataset.size === appSettings.fontSize));
+      document.querySelectorAll('.pattern-option').forEach(p => p.classList.toggle('active', p.dataset.pattern === appSettings.pattern));
+      updateAvatarPreview('user', appSettings.userAvatar);
+      updateAvatarPreview('ai', appSettings.aiAvatar);
+      updateCustomBgPreview();
       document.getElementById('settings-overlay').classList.add('show'); toggleDrawer(false);
     }
     function closeSettings() { document.getElementById('settings-overlay').classList.remove('show'); }
-    function selectTheme(theme) { document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === theme)); appSettings.theme = theme; if (theme === 'pink') document.body.removeAttribute('data-theme'); else document.body.setAttribute('data-theme', theme); }
+    function selectTheme(theme) { document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === theme)); appSettings.theme = theme; if (theme === 'pink') document.body.removeAttribute('data-theme'); else document.body.setAttribute('data-theme', theme); applyPattern(); if (chartMode === 'linechart') renderLineChart(); }
     function selectFontSize(size) { document.querySelectorAll('.fontsize-btn').forEach(b => b.classList.toggle('active', b.dataset.size === size)); appSettings.fontSize = size; if (size === 'medium') document.body.removeAttribute('data-fontsize'); else document.body.setAttribute('data-fontsize', size); }
     function saveSettings() { appSettings.userName = document.getElementById('settings-user-name').value.trim(); appSettings.aiName = document.getElementById('settings-ai-name').value.trim(); saveSettingsToStorage(); applySettings(); if (currentMessages.length > 0) renderMessages(currentMessages); closeSettings(); showToast('设置已保存'); }
-    async function loadFromDatabase() { try { allConversations = await getAllConversationsFromDb(); filteredConversations = [...allConversations]; if (allConversations.length > 0) { processAllConversations(); document.getElementById('view-upload').style.display = 'none'; if (filteredConversations.length > 0) openConversation(filteredConversations[0].id); } favorites = await getAllFavoritesFromDb(); } catch (e) { console.error('加载数据失败', e); } }
+    
+    // 时间戳校验函数，过滤异常数据（如57370年这种）
+    function isValidTimestamp(ts) {
+      if (!ts || ts <= 0) return false;
+      const date = new Date(ts * 1000);
+      const year = date.getFullYear();
+      return year >= 2020 && year <= 2030;
+    }
+    async function loadFromDatabase() { 
+      try { 
+        allConversations = await getAllConversationsFromDb(); 
+        filteredConversations = [...allConversations]; 
+        if (allConversations.length > 0) { 
+          processAllConversations(); 
+          document.getElementById('view-upload').style.display = 'none'; 
+          const lastConvId = getLastViewedConv();
+          const lastConv = lastConvId ? allConversations.find(c => c.id === lastConvId) : null;
+          if (lastConv) { openConversation(lastConvId); } 
+          else if (filteredConversations.length > 0) { openConversation(filteredConversations[0].id); }
+        } 
+        favorites = await getAllFavoritesFromDb(); 
+      } catch (e) { console.error('加载数据失败', e); } 
+    }
+    
     function toggleHeaderCollapse() { isHeaderCollapsed = !isHeaderCollapsed; const s = document.getElementById('collapsible-section'), b = document.getElementById('collapse-btn'), t = document.getElementById('timeline-nav'); if (isHeaderCollapsed) { s.classList.add('collapsed'); b.classList.add('collapsed'); t.classList.add('collapsed'); } else { s.classList.remove('collapsed'); b.classList.remove('collapsed'); t.classList.remove('collapsed'); } }
     
-    // ★ 切换搜索模式时保留关键词
     function setSearchMode(mode) {
       searchMode = mode;
       document.querySelectorAll('.search-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
       document.getElementById('search-input').placeholder = mode === 'global' ? '全局搜索消息内容...' : '搜索当前对话...';
-      
-      // 如果有已输入的关键词，立即触发搜索
       const keyword = document.getElementById('search-input').value.trim();
-      if (keyword) {
-        handleSearch();
-      } else {
-        document.getElementById('global-search-info').classList.remove('show');
-        if (mode === 'current' && currentMessages.length > 0) {
-          renderMessages(currentMessages);
-        }
-      }
+      if (keyword) { handleSearch(); } else { document.getElementById('global-search-info').classList.remove('show'); if (mode === 'current' && currentMessages.length > 0) { renderMessages(currentMessages); } }
     }
     
     function handleSearch() {
       const keyword = document.getElementById('search-input').value.toLowerCase().trim();
       currentSearchKeyword = keyword;
-      
-      if (!keyword) { 
-        document.getElementById('global-search-info').classList.remove('show'); 
-        if (searchMode === 'current') renderMessages(currentMessages); 
-        else { 
-          document.getElementById('view-global-search').classList.remove('show'); 
-          document.getElementById('view-chat').classList.add('show'); 
-        } 
-        return; 
-      }
-      if (searchMode === 'current') performCurrentSearch(keyword); 
-      else performGlobalSearch(keyword);
+      if (!keyword) { document.getElementById('global-search-info').classList.remove('show'); if (searchMode === 'current') renderMessages(currentMessages); else { document.getElementById('view-global-search').classList.remove('show'); document.getElementById('view-chat').classList.add('show'); } return; }
+      if (searchMode === 'current') performCurrentSearch(keyword); else performGlobalSearch(keyword);
     }
     
     function performCurrentSearch(keyword) {
@@ -629,35 +1314,16 @@
       }).join('');
     }
     
-    // ★ 新增：安全转义JS字符串用于onclick
-    function escapeJsString(s) {
-      return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
-    }
-    
+    function escapeJsString(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
     function highlightKeywordInText(text, keyword) { if (!keyword) return text; const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi'); return text.replace(regex, '<span class="highlight">$1</span>'); }
     function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
     
-    // ★ 修改：跳转后保留关键词高亮，并修复滚动定位
     function jumpToSearchResult(convId, msgId, keyword) {
-      // 保存关键词用于高亮显示
       currentSearchKeyword = keyword;
-      
-      // 打开对话并传入关键词进行高亮，同时跳过滚动重置
       openConversation(convId, keyword, true);
-      
-      // 切换视图
       document.getElementById('view-global-search').classList.remove('show'); 
       document.getElementById('view-chat').classList.add('show');
-      
-      // ★ 增加延时确保DOM渲染完成后再滚动
-      setTimeout(() => { 
-        const el = document.getElementById(`msg-${msgId}`); 
-        if (el) { 
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-          el.classList.add('highlight'); 
-          setTimeout(() => el.classList.remove('highlight'), 3000); 
-        } 
-      }, 300);
+      setTimeout(() => { const el = document.getElementById(`msg-${msgId}`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); } }, 300);
     }
     
     function navigateSearchResult(dir) {
@@ -677,13 +1343,7 @@
       document.getElementById('search-result-count').textContent = `${currentSearchResultIndex + 1} / ${flatSearchResults.length}`;
     }
     
-    // ★ 返回时保留搜索词
-    function exitGlobalSearch() { 
-      document.getElementById('view-global-search').classList.remove('show'); 
-      document.getElementById('view-chat').classList.add('show'); 
-      document.getElementById('global-search-info').classList.remove('show'); 
-      setSearchMode('current'); 
-    }
+    function exitGlobalSearch() { document.getElementById('view-global-search').classList.remove('show'); document.getElementById('view-chat').classList.add('show'); document.getElementById('global-search-info').classList.remove('show'); setSearchMode('current'); }
     
     function setupDragDrop() { const ub = document.getElementById('upload-box'); if (!ub) return; ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => ub.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); })); ub.addEventListener('dragover', () => ub.classList.add('dragover')); ub.addEventListener('dragleave', () => ub.classList.remove('dragover')); ub.addEventListener('drop', e => { ub.classList.remove('dragover'); const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.json')); if (files.length > 0) processFiles(files); }); }
     function handleFileSelect(e) { const files = Array.from(e.target.files); if (files.length > 0) processFiles(files); e.target.value = ''; }
@@ -725,7 +1385,7 @@
         messages.forEach(msg => {
           msg.convIndex = convIndex; msg.convId = conv.id; msg.convTitle = conv.title || `对话 ${convIndex + 1}`;
           allMessages.push(msg);
-          if (msg.time) {
+          if (msg.time && isValidTimestamp(msg.time)) {
             const ds = formatDateKey(msg.time);
             if (!messagesByDate[ds]) messagesByDate[ds] = [];
             messagesByDate[ds].push(msg);
@@ -736,7 +1396,19 @@
           }
         });
       });
-      renderConversationList(); updateDrawerSubtitle(); renderCalendar(); renderTimeline();
+      // 预计算所有月份的热力图数据缓存
+      monthStatsCache = {};
+      Object.keys(statsByDate).forEach(ds => {
+        const [year, month] = ds.split('-');
+        const monthKey = `${year}-${month}`;
+        if (!monthStatsCache[monthKey]) monthStatsCache[monthKey] = { totalWords: 0, activeDays: 0, days: {} };
+        const st = statsByDate[ds];
+        const dayWords = st.userWords + st.aiWords;
+        monthStatsCache[monthKey].totalWords += dayWords;
+        monthStatsCache[monthKey].activeDays++;
+        monthStatsCache[monthKey].days[ds] = dayWords;
+      });
+      renderConversationList(); updateDrawerSubtitle(); renderCalendar(); renderTimeline(); updateConvFilterOptions();
     }
     function parseMessages(mapping, currentNode) {
       if (!mapping) return [];
@@ -778,13 +1450,41 @@
     }
     function toggleSelectMode() { isSelectMode = !isSelectMode; selectedConvIds.clear(); const btn = document.getElementById('select-mode-btn'), eb = document.getElementById('export-selected-btn'), db = document.getElementById('delete-selected-btn'); if (isSelectMode) { btn.classList.add('active'); btn.innerHTML = '✓ 取消'; eb.style.display = 'flex'; db.style.display = 'flex'; } else { btn.classList.remove('active'); btn.innerHTML = '☑ 多选'; eb.style.display = 'none'; db.style.display = 'none'; } renderConversationList(); }
     function toggleConvSelection(convId) { if (selectedConvIds.has(convId)) selectedConvIds.delete(convId); else selectedConvIds.add(convId); renderConversationList(); }
-    function exportSelectedConversations() { if (selectedConvIds.size === 0) { showToast('请先选择要导出的对话'); return; } const sc = allConversations.filter(c => selectedConvIds.has(c.id)), ds = JSON.stringify(sc, null, 2), blob = new Blob([ds], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `对话导出_${selectedConvIds.size}个_${formatDateForFile(new Date())}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast(`已导出 ${selectedConvIds.size} 个对话`); toggleSelectMode(); }
+    function exportSelectedConversations() { if (selectedConvIds.size === 0) { showToast('请先选择要导出的对话'); return; } document.getElementById('conv-export-format-overlay').classList.add('show'); }
+    function closeConvExportFormatPanel() { document.getElementById('conv-export-format-overlay').classList.remove('show'); }
+    function doExportConversations(format) {
+      closeConvExportFormatPanel();
+      const sc = allConversations.filter(c => selectedConvIds.has(c.id));
+      const timestamp = formatDateForFile(new Date());
+      const userName = appSettings.userName || '用户';
+      const aiName = appSettings.aiName || 'AI';
+      
+      if (format === 'json') {
+        const ds = JSON.stringify(sc, null, 2);
+        downloadFile(ds, `conversations_${sc.length}_${timestamp}.json`, 'application/json');
+      } else if (format === 'txt') {
+        let et = `对话导出\n导出时间: ${new Date().toLocaleString('zh-CN')}\n共 ${sc.length} 个对话\n${'='.repeat(50)}\n`;
+        sc.forEach(conv => {
+          const messages = parseMessages(conv.mapping, conv.current_node);
+          et += `\n\n${'═'.repeat(50)}\n📚 ${conv.title || '未命名对话'}\n${'─'.repeat(50)}\n`;
+          messages.forEach(msg => {
+            if (msg.type === 'custom_instructions' || msg.type === 'memory_update' || msg.type === 'memory_call') return;
+            const role = msg.role === 'user' ? `👤 ${userName}` : `🤖 ${aiName}`;
+            const time = msg.time ? formatFullDateTime(msg.time) : '';
+            et += `\n[${role}] ${time}\n${msg.content}\n`;
+          });
+        });
+        downloadFile(et, `conversations_${sc.length}_${timestamp}.txt`, 'text/plain;charset=utf-8');
+      }
+      
+      showToast(`已导出 ${sc.length} 个对话`);
+      toggleSelectMode();
+    }
     function showDeleteConvModal(convId, convTitle) { showModal('🗑️', '删除对话', `确定要删除「${convTitle}」吗？\n此操作无法撤销！`, async () => { await performDeleteConversation(convId); }, true); }
     function showDeleteSelectedModal() { if (selectedConvIds.size === 0) { showToast('请先选择要删除的对话'); return; } showModal('🗑️', '批量删除', `确定要删除选中的 ${selectedConvIds.size} 个对话吗？\n此操作无法撤销！`, async () => { showLoading('正在删除...'); try { const ids = [...selectedConvIds]; for (const id of ids) { await deleteConversationFromDb(id); allConversations = allConversations.filter(c => c.id !== id); } selectedConvIds.clear(); toggleSelectMode(); processAllConversations(); if (allConversations.length === 0) { document.getElementById('view-upload').style.display = 'flex'; document.getElementById('view-chat').classList.remove('show'); currentConvId = null; } else if (ids.includes(currentConvId)) openConversation(allConversations[0].id); showToast('已删除选中的对话'); } catch (e) { console.error('删除失败', e); showToast('删除失败，请重试'); } hideLoading(); }, true); }
     async function performDeleteConversation(convId) { showLoading('正在删除...'); try { await deleteConversationFromDb(convId); allConversations = allConversations.filter(c => c.id !== convId); processAllConversations(); if (allConversations.length === 0) { document.getElementById('view-upload').style.display = 'flex'; document.getElementById('view-chat').classList.remove('show'); currentConvId = null; } else if (currentConvId === convId) openConversation(allConversations[0].id); showToast('已删除对话'); } catch (e) { console.error('删除失败', e); showToast('删除失败，请重试'); } hideLoading(); }
     function filterConversations() { const kw = document.getElementById('conv-search-input').value.toLowerCase().trim(); filteredConversations = !kw ? [...allConversations] : allConversations.filter(c => (c.title || '').toLowerCase().includes(kw)); renderConversationList(); }
     
-    // ★ 修改：openConversation 支持跳过滚动重置
     function openConversation(convId, highlightKeyword = null, skipScrollReset = false) { 
       const conv = allConversations.find(c => c.id === convId); 
       if (!conv) return; 
@@ -792,11 +1492,9 @@
       currentConvIndex = allConversations.indexOf(conv); 
       currentMessages = parseMessages(conv.mapping, conv.current_node); 
       document.getElementById('chat-title').textContent = conv.title || '未命名对话'; 
-      
-      // 如果传入了高亮关键词，则使用它
+      saveLastViewedConv(convId);
       const kwToHighlight = highlightKeyword || null;
       renderMessages(currentMessages, null, false, kwToHighlight); 
-      
       renderChatTimeline(); 
       renderConversationList(); 
       document.getElementById('view-upload').style.display = 'none'; 
@@ -809,11 +1507,8 @@
       document.getElementById('view-conv-select').classList.remove('show');
       document.querySelectorAll('.drawer-menu-item').forEach(el => el.classList.toggle('active', el.dataset.view === 'conversations')); 
       toggleDrawer(false);
-      
-      // ★ 只有在非跳转模式下才重置滚动位置
-      if (!skipScrollReset) {
-        document.getElementById('chat-messages').scrollTop = 0;
-      }
+      if (!skipScrollReset) { document.getElementById('chat-messages').scrollTop = 0; }
+      applyPattern();
     }
     
     function renderMessages(messages, container = null, showConvTitle = false, highlightKw = null) {
@@ -828,120 +1523,819 @@
         let dc = escapeHtml(msg.content); if (highlightKw) dc = highlightKeywordInText(dc, highlightKw);
         if (msg.type === 'custom_instructions') { html += `<div class="message system" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">⚙️</div></div><div class="message-body"><div class="message-bubble"><span class="system-label">📋 窗口自定义指令</span><div style="white-space: pre-wrap;">${dc}</div></div></div></div>`; }
         else if (msg.type === 'memory_update' || msg.type === 'memory_call') { html += `<div class="message memory" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">🧠</div></div><div class="message-body"><div class="message-bubble"><span class="memory-label">💾 记忆库操作</span><div style="white-space: pre-wrap;">${dc}</div></div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span></div></div></div>`; }
-        else { const isFav = favorites.has(msg.id), mb = msg.model ? `<span class="message-model">${formatModelName(msg.model)}</span>` : '', an = msg.role === 'user' ? userName : aiName; html += `<div class="message ${msg.role}" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">${msg.role === 'user' ? '🧸' : '🤖'}</div>${an ? `<span class="avatar-name">${escapeHtml(an)}</span>` : ''}</div><div class="message-body"><div class="message-bubble">${dc}</div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span>${mb}<button class="star-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${msg.id}', this)">${isFav ? '⭐' : '☆'}</button></div></div></div>`; }
+        else { 
+          const isFav = favorites.has(msg.id), mb = msg.model ? `<span class="message-model">${formatModelName(msg.model)}</span>` : '', an = msg.role === 'user' ? userName : aiName; 
+          const convIdForFav = msg.convId || currentConvId;
+          const avatarContent = msg.role === 'user' 
+            ? (appSettings.userAvatar ? `<img src="${appSettings.userAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '🧸')
+            : (appSettings.aiAvatar ? `<img src="${appSettings.aiAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '🤖');
+          html += `<div class="message ${msg.role}" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">${avatarContent}</div>${an ? `<span class="avatar-name">${escapeHtml(an)}</span>` : ''}</div><div class="message-body"><div class="message-bubble">${dc}</div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span>${mb}<button class="star-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${msg.id}', '${convIdForFav}', this)">${isFav ? '⭐' : '☆'}</button><button class="msg-delete-btn" onclick="showDeleteMsgModal('${msg.id}', '${convIdForFav}')" title="删除此消息">🗑</button></div></div></div>`; 
+        }
       });
       tc.innerHTML = html;
     }
     function formatModelName(m) { const mm = { 'gpt-4': 'GPT-4', 'gpt-4o': 'GPT-4o', 'gpt-4o-mini': 'GPT-4o mini', 'gpt-4-turbo': 'GPT-4 Turbo', 'gpt-3.5-turbo': 'GPT-3.5', 'text-davinci-002-render-sha': 'GPT-3.5', 'gpt-4-gizmo': 'GPT-4 (GPTs)', 'o1-preview': 'o1-preview', 'o1-mini': 'o1-mini' }; return mm[m] || m; }
     function renderChatTimeline() { const nav = document.getElementById('timeline-nav'), dates = [...new Set(currentMessages.filter(m => m.time).map(m => formatDateKey(m.time)))]; if (dates.length <= 1) { nav.classList.remove('show'); return; } nav.innerHTML = dates.map(d => `<button class="timeline-btn" onclick="scrollToDate('${d}')">${formatDateShort(d)}</button>`).join(''); nav.classList.add('show'); }
     function scrollToDate(ds) { const d = document.getElementById(`date-${ds}`); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    async function toggleFavorite(msgId, btn) { if (favorites.has(msgId)) { favorites.delete(msgId); await removeFavoriteFromDb(msgId); btn.classList.remove('active'); btn.textContent = '☆'; } else { favorites.add(msgId); await saveFavoriteToDb(msgId); btn.classList.add('active'); btn.textContent = '⭐'; } }
+    
+    async function toggleFavorite(msgId, convId, btn) { 
+      if (favorites.has(msgId)) { 
+        favorites.delete(msgId); 
+        await removeFavoriteFromDb(msgId); 
+        btn.classList.remove('active'); 
+        btn.textContent = '☆'; 
+      } else { 
+        favorites.set(msgId, convId); 
+        await saveFavoriteToDb(msgId, convId); 
+        btn.classList.add('active'); 
+        btn.textContent = '⭐'; 
+      } 
+    }
+    
+    // 删除单条消息
+    function showDeleteMsgModal(msgId, convId) {
+      showModal('🗑️', '删除消息', '确定要删除这条消息吗？\n此操作无法撤销！', async () => {
+        await performDeleteMessage(msgId, convId);
+      }, true);
+    }
+    
+    async function performDeleteMessage(msgId, convId) {
+      try {
+        // 从当前对话中找到并删除消息
+        const conv = allConversations.find(c => c.id === convId);
+        if (conv && conv.mapping && conv.mapping[msgId]) {
+          delete conv.mapping[msgId];
+          // 保存更新后的对话到数据库
+          await saveConversationToDb(conv);
+        }
+        // 从allMessages中移除
+        const msgIndex = allMessages.findIndex(m => m.id === msgId);
+        if (msgIndex >= 0) {
+          const msg = allMessages[msgIndex];
+          // 更新统计数据
+          if (msg.time && isValidTimestamp(msg.time)) {
+            const ds = formatDateKey(msg.time);
+            if (statsByDate[ds]) {
+              const words = msg.content.length;
+              if (msg.role === 'user') statsByDate[ds].userWords -= words;
+              else statsByDate[ds].aiWords -= words;
+              statsByDate[ds].count--;
+              if (statsByDate[ds].count <= 0) delete statsByDate[ds];
+            }
+            if (messagesByDate[ds]) {
+              messagesByDate[ds] = messagesByDate[ds].filter(m => m.id !== msgId);
+              if (messagesByDate[ds].length === 0) delete messagesByDate[ds];
+            }
+          }
+          // 更新对话统计
+          if (conversationStats[convId]) {
+            conversationStats[convId].messageCount--;
+            conversationStats[convId].totalChars -= msg.content.length;
+            conversationStats[convId].estimatedTokens = Math.round(conversationStats[convId].totalChars / 2.5);
+          }
+          allMessages.splice(msgIndex, 1);
+        }
+        // 从currentMessages中移除并重新渲染
+        currentMessages = currentMessages.filter(m => m.id !== msgId);
+        // 如果有收藏也移除
+        if (favorites.has(msgId)) {
+          favorites.delete(msgId);
+          await removeFavoriteFromDb(msgId);
+        }
+        // 重新渲染
+        renderMessages(currentMessages);
+        renderConversationList();
+        showToast('已删除消息');
+      } catch (e) {
+        console.error('删除消息失败', e);
+        showToast('删除失败，请重试');
+      }
+    }
+    
     function toggleFavSelectMode() { isFavSelectMode = !isFavSelectMode; selectedFavMsgIds.clear(); const btn = document.getElementById('fav-select-btn'), sab = document.getElementById('fav-select-all-btn'), ub = document.getElementById('fav-unfav-all-btn'), eb = document.getElementById('fav-export-btn'); if (isFavSelectMode) { btn.classList.add('active'); btn.innerHTML = '✓ 取消'; sab.style.display = 'inline-flex'; ub.style.display = 'inline-flex'; eb.style.display = 'inline-flex'; } else { btn.classList.remove('active'); btn.innerHTML = '☑ 多选'; sab.style.display = 'none'; ub.style.display = 'none'; eb.style.display = 'none'; } renderFavorites(); }
     function toggleFavMsgSelection(msgId) { if (selectedFavMsgIds.has(msgId)) selectedFavMsgIds.delete(msgId); else selectedFavMsgIds.add(msgId); renderFavorites(); }
     function selectAllFavorites() { const fm = allMessages.filter(m => favorites.has(m.id)); if (selectedFavMsgIds.size === fm.length) selectedFavMsgIds.clear(); else fm.forEach(m => selectedFavMsgIds.add(m.id)); renderFavorites(); }
     async function unfavoriteSelected() { if (selectedFavMsgIds.size === 0) { showToast('请先选择要取消收藏的消息'); return; } showModal('🗑️', '取消收藏', `确定要取消收藏选中的 ${selectedFavMsgIds.size} 条消息吗？`, async () => { showLoading('正在取消收藏...'); try { for (const id of selectedFavMsgIds) { favorites.delete(id); await removeFavoriteFromDb(id); } const cnt = selectedFavMsgIds.size; selectedFavMsgIds.clear(); renderFavorites(); showToast(`已取消收藏 ${cnt} 条消息`); } catch (e) { console.error('取消收藏失败', e); showToast('操作失败，请重试'); } hideLoading(); }, true); }
-    function exportSelectedFavorites() { if (selectedFavMsgIds.size === 0) { showToast('请先选择要导出的消息'); return; } const sm = allMessages.filter(m => selectedFavMsgIds.has(m.id)); let et = `# 收藏的消息导出\n导出时间: ${new Date().toLocaleString('zh-CN')}\n共 ${sm.length} 条消息\n\n---\n\n`; let lct = ''; sm.forEach(m => { if (m.convTitle !== lct) { et += `## 📚 ${m.convTitle}\n\n`; lct = m.convTitle; } const r = m.role === 'user' ? '🦜 我' : '🤖 AI', t = m.time ? formatFullDateTime(m.time) : ''; et += `### ${r} ${t}\n\n${m.content}\n\n---\n\n`; }); const blob = new Blob([et], { type: 'text/markdown;charset=utf-8' }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `收藏消息导出_${selectedFavMsgIds.size}条_${formatDateForFile(new Date())}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast(`已导出 ${selectedFavMsgIds.size} 条收藏消息`); toggleFavSelectMode(); }
-    function renderFavorites() { const c = document.getElementById('favorites-list'); if (favorites.size === 0) { c.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>还没有收藏任何消息~<br>在聊天中点击☆来收藏吧</p></div>'; return; } const fm = allMessages.filter(m => favorites.has(m.id)); if (fm.length === 0) { c.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>收藏的消息暂时无法显示<br>可能对话数据还未加载</p></div>'; return; } const un = appSettings.userName || '', an = appSettings.aiName || ''; c.innerHTML = fm.map(m => { const isSel = selectedFavMsgIds.has(m.id), mb = m.model ? `<span class="message-model">${formatModelName(m.model)}</span>` : '', avn = m.role === 'user' ? un : an; return `<div class="message ${m.role}" style="display: flex; align-items: flex-start;"><div class="fav-msg-checkbox ${isFavSelectMode ? 'show' : ''} ${isSel ? 'checked' : ''}" onclick="toggleFavMsgSelection('${m.id}')">${isSel ? '✓' : ''}</div><div class="message-avatar-wrapper"><div class="message-avatar">${m.role === 'user' ? '🧸' : '🤖'}</div>${avn ? `<span class="avatar-name">${escapeHtml(avn)}</span>` : ''}</div><div class="message-body"><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-footer"><span class="message-time">${escapeHtml(m.convTitle)} · ${m.time ? formatFullDateTime(m.time) : ''}</span>${mb}<button class="star-btn active" onclick="toggleFavorite('${m.id}', this); setTimeout(renderFavorites, 100);">⭐</button></div></div></div>`; }).join(''); }
-    function renderCalendar() { const c = document.getElementById('calendar-days'); document.getElementById('month-label').textContent = `${currentYear}年${currentMonth + 1}月`; const fd = new Date(currentYear, currentMonth, 1).getDay(), dim = new Date(currentYear, currentMonth + 1, 0).getDate(); let html = '', mtw = 0, mad = 0; for (let i = 0; i < fd; i++) html += '<div class="calendar-day empty"></div>'; for (let d = 1; d <= dim; d++) { const ds = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`, st = statsByDate[ds]; let hc = '', wl = ''; if (st) { const tw = st.userWords + st.aiWords; mtw += tw; mad++; wl = formatWordCount(tw); if (tw < 5000) hc = 'heat-1'; else if (tw < 20000) hc = 'heat-2'; else if (tw < 50000) hc = 'heat-3'; else hc = 'heat-4'; } html += `<div class="calendar-day ${hc}" onclick="showDayMessages('${ds}')"><span class="day-num">${d}</span>${wl ? `<span class="day-words">${wl}</span>` : ''}</div>`; } c.innerHTML = html; document.getElementById('stat-total-words').textContent = formatWordCount(mtw); document.getElementById('stat-total-days').textContent = mad + '天'; }
-    function changeMonth(d) { currentMonth += d; if (currentMonth < 0) { currentMonth = 11; currentYear--; } else if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }
     
-    // ★ 修改：showDayMessages 现在显示窗口选择页面
-    function showDayMessages(ds) { 
-      const dm = messagesByDate[ds]; 
-      if (!dm || dm.length === 0) { 
-        showToast('这天没有消息'); 
-        return; 
+    function showExportFormatPanel() {
+      if (selectedFavMsgIds.size === 0) { showToast('请先选择要导出的消息'); return; }
+      document.getElementById('export-format-overlay').classList.add('show');
+    }
+    function closeExportFormatPanel() { document.getElementById('export-format-overlay').classList.remove('show'); }
+    
+    function handleAvatarUpload(event, type) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxSize = 128;
+          let width = img.width, height = img.height;
+          if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } }
+          else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const base64 = canvas.toDataURL('image/jpeg', 0.8);
+          
+          if (type === 'user') { appSettings.userAvatar = base64; }
+          else { appSettings.aiAvatar = base64; }
+          updateAvatarPreview(type, base64);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+    
+    function deleteAvatar(type) {
+      if (type === 'user') { appSettings.userAvatar = ''; updateAvatarPreview('user', ''); }
+      else { appSettings.aiAvatar = ''; updateAvatarPreview('ai', ''); }
+    }
+    
+    function updateAvatarPreview(type, base64) {
+      const preview = document.getElementById(type === 'user' ? 'user-avatar-preview' : 'ai-avatar-preview');
+      const defaultEmoji = type === 'user' ? '🧸' : '🤖';
+      if (base64) {
+        preview.innerHTML = `<img src="${base64}" alt="avatar"><span class="avatar-delete" onclick="event.stopPropagation(); deleteAvatar('${type}')">×</span>`;
+      } else {
+        preview.innerHTML = `${defaultEmoji}<span class="avatar-delete" onclick="event.stopPropagation(); deleteAvatar('${type}')">×</span>`;
+      }
+    }
+    
+    function doExportFavorites(format) {
+      closeExportFormatPanel();
+      const sm = allMessages.filter(m => selectedFavMsgIds.has(m.id));
+      const timestamp = formatDateForFile(new Date());
+      const userName = appSettings.userName || '我';
+      const aiName = appSettings.aiName || 'AI';
+      
+      if (format === 'md') {
+        let et = `# 收藏的消息导出\n导出时间: ${new Date().toLocaleString('zh-CN')}\n共 ${sm.length} 条消息\n\n---\n\n`; 
+        let lct = ''; 
+        sm.forEach(m => { 
+          if (m.convTitle !== lct) { et += `## 📚 ${m.convTitle}\n\n`; lct = m.convTitle; } 
+          const r = m.role === 'user' ? `🦜 ${userName}` : `🤖 ${aiName}`, t = m.time ? formatFullDateTime(m.time) : ''; 
+          et += `### ${r} ${t}\n\n${m.content}\n\n---\n\n`; 
+        }); 
+        downloadFile(et, `favorites_${sm.length}_${timestamp}.md`, 'text/markdown;charset=utf-8');
+      } 
+      else if (format === 'txt') {
+        let et = `收藏消息导出\n导出时间: ${new Date().toLocaleString('zh-CN')}\n共 ${sm.length} 条消息\n${'='.repeat(50)}\n\n`;
+        let lct = '';
+        sm.forEach(m => {
+          if (m.convTitle !== lct) { et += `\n[${m.convTitle}]\n${'─'.repeat(30)}\n`; lct = m.convTitle; }
+          const r = m.role === 'user' ? userName : aiName, t = m.time ? formatFullDateTime(m.time) : '';
+          et += `\n[${r}] ${t}\n${m.content}\n`;
+        });
+        downloadFile(et, `favorites_${sm.length}_${timestamp}.txt`, 'text/plain;charset=utf-8');
       }
       
-      // 按窗口ID分组，统计每个窗口在这天的消息数
-      const convMap = new Map();
-      dm.forEach(msg => {
-        if (!convMap.has(msg.convId)) {
-          convMap.set(msg.convId, {
-            convId: msg.convId,
-            convTitle: msg.convTitle,
-            messageCount: 0,
-            userCount: 0,
-            aiCount: 0
-          });
+      showToast(`已导出 ${sm.length} 条收藏消息`); 
+      toggleFavSelectMode();
+    }
+    
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    function renderFavorites() { 
+      const c = document.getElementById('favorites-list'); 
+      if (favorites.size === 0) { c.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>还没有收藏任何消息~<br>在聊天中点击☆来收藏吧</p></div>'; return; } 
+      const fm = allMessages.filter(m => favorites.has(m.id)); 
+      if (fm.length === 0) { c.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>收藏的消息暂时无法显示<br>可能对话数据还未加载</p></div>'; return; } 
+      const un = appSettings.userName || '', an = appSettings.aiName || ''; 
+      c.innerHTML = fm.map(m => { 
+        const isSel = selectedFavMsgIds.has(m.id), mb = m.model ? `<span class="message-model">${formatModelName(m.model)}</span>` : '', avn = m.role === 'user' ? un : an;
+        const convIdForJump = m.convId || favorites.get(m.id);
+        const avatarContent = m.role === 'user' 
+          ? (appSettings.userAvatar ? `<img src="${appSettings.userAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '🧸')
+          : (appSettings.aiAvatar ? `<img src="${appSettings.aiAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '🤖');
+        return `<div class="message ${m.role}" style="display: flex; align-items: flex-start;"><div class="fav-msg-checkbox ${isFavSelectMode ? 'show' : ''} ${isSel ? 'checked' : ''}" onclick="toggleFavMsgSelection('${m.id}')">${isSel ? '✓' : ''}</div><div class="message-avatar-wrapper"><div class="message-avatar">${avatarContent}</div>${avn ? `<span class="avatar-name">${escapeHtml(avn)}</span>` : ''}</div><div class="message-body"><div class="message-bubble">${escapeHtml(m.content)}</div><div class="message-footer"><span class="message-time">${escapeHtml(m.convTitle)} · ${m.time ? formatFullDateTime(m.time) : ''}</span>${mb}<button class="star-btn active" onclick="toggleFavorite('${m.id}', '${convIdForJump}', this); setTimeout(renderFavorites, 100);">⭐</button>${convIdForJump ? `<button class="fav-jump-btn" onclick="jumpToFavoriteMessage('${convIdForJump}', '${m.id}')">跳转 →</button>` : ''}</div></div></div>`; 
+      }).join(''); 
+    }
+    
+    function jumpToFavoriteMessage(convId, msgId) {
+      openConversation(convId, null, true);
+      setTimeout(() => {
+        const el = document.getElementById(`msg-${msgId}`);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); }
+      }, 300);
+    }
+    
+    function renderCalendar() {
+      const c = document.getElementById('calendar-days');
+      updateDateLabel();
+      const fd = new Date(currentYear, currentMonth, 1).getDay();
+      const dim = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+      const cached = monthStatsCache[monthKey];
+      let html = '';
+      // 填充空白格子
+      for (let i = 0; i < fd; i++) html += '<div class="calendar-day empty"></div>';
+      // 渲染每一天
+      for (let d = 1; d <= dim; d++) {
+        const ds = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const tw = cached?.days?.[ds] || 0;
+        let hc = '', wl = '';
+        if (tw > 0) {
+          wl = formatWordCount(tw);
+          if (tw < 5000) hc = 'heat-1';
+          else if (tw < 20000) hc = 'heat-2';
+          else if (tw < 50000) hc = 'heat-3';
+          else hc = 'heat-4';
         }
-        const info = convMap.get(msg.convId);
-        info.messageCount++;
-        if (msg.role === 'user') info.userCount++;
-        else if (msg.role === 'assistant') info.aiCount++;
+        html += `<div class="calendar-day ${hc}" onclick="showDayMessages('${ds}')"><span class="day-num">${d}</span>${wl ? `<span class="day-words">${wl}</span>` : ''}</div>`;
+      }
+      c.innerHTML = html;
+      // 使用缓存的统计数据
+      const mtw = cached?.totalWords || 0;
+      const mad = cached?.activeDays || 0;
+      document.getElementById('stat-total-words').textContent = formatWordCount(mtw);
+      document.getElementById('stat-total-days').textContent = mad + '天';
+      renderWordCloud();
+      renderOverview();
+    }
+    function changeMonth(d) { 
+      if (chartMode === 'year') {
+        // 年度模式下只切换年份
+        currentYear += d;
+        updateDateLabel();
+        renderYearChart();
+      } else {
+        currentMonth += d; 
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; } 
+        else if (currentMonth > 11) { currentMonth = 0; currentYear++; } 
+        renderCalendar(); 
+        if (chartMode === 'linechart') renderLineChart();
+      }
+    }
+    
+    // 图表模式切换
+    function setChartMode(mode) {
+      chartMode = mode;
+      document.getElementById('heatmap-btn').classList.toggle('active', mode === 'heatmap');
+      document.getElementById('linechart-btn').classList.toggle('active', mode === 'linechart');
+      document.getElementById('yearchart-btn').classList.toggle('active', mode === 'year');
+      document.getElementById('calendar-container').style.display = mode === 'heatmap' ? 'block' : 'none';
+      document.getElementById('line-chart-container').classList.toggle('show', mode === 'linechart');
+      document.getElementById('year-chart-container').classList.toggle('show', mode === 'year');
+      // 更新月份/年份标签
+      updateDateLabel();
+      if (mode === 'linechart') renderLineChart();
+      if (mode === 'year') renderYearChart();
+    }
+    
+    function updateDateLabel() {
+      const label = document.getElementById('month-label');
+      if (chartMode === 'year') {
+        label.textContent = `${currentYear}年`;
+      } else {
+        label.textContent = `${currentYear}年${currentMonth + 1}月`;
+      }
+    }
+    
+    // 绘制折线图
+    function renderLineChart() {
+      const canvas = document.getElementById('line-chart-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      
+      // 处理设备像素比，解决锯齿问题
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = rect.width - 32;
+      const displayHeight = 200;
+      canvas.width = displayWidth * dpr;
+      canvas.height = displayHeight * dpr;
+      canvas.style.width = displayWidth + 'px';
+      canvas.style.height = displayHeight + 'px';
+      ctx.scale(dpr, dpr);
+      
+      const dim = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const data = [];
+      let maxVal = 0;
+      for (let d = 1; d <= dim; d++) {
+        const ds = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const st = statsByDate[ds];
+        const val = st ? (st.userWords + st.aiWords) : 0;
+        data.push(val);
+        if (val > maxVal) maxVal = val;
+      }
+      if (maxVal === 0) maxVal = 1000;
+      
+      const padding = { top: 20, right: 20, bottom: 30, left: 50 };
+      const chartW = displayWidth - padding.left - padding.right;
+      const chartH = displayHeight - padding.top - padding.bottom;
+      
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+      
+      // 获取主题色
+      const style = getComputedStyle(document.body);
+      const primaryColor = style.getPropertyValue('--primary').trim() || '#e8b4b8';
+      const textColor = style.getPropertyValue('--text-light').trim() || '#8a7a7a';
+      const borderColor = style.getPropertyValue('--border').trim() || '#f0e0e0';
+      
+      // 绘制网格线
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(displayWidth - padding.right, y);
+        ctx.stroke();
+      }
+      
+      // 绘制Y轴标签
+      ctx.fillStyle = textColor;
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * i;
+        const val = Math.round(maxVal * (4 - i) / 4);
+        ctx.fillText(formatWordCount(val), padding.left - 8, y + 4);
+      }
+      
+      // 绘制X轴标签
+      ctx.textAlign = 'center';
+      const step = Math.ceil(dim / 10);
+      for (let d = 1; d <= dim; d += step) {
+        const x = padding.left + ((d - 1) / (dim - 1)) * chartW;
+        ctx.fillText(d + '日', x, displayHeight - 8);
+      }
+      
+      // 绘制折线
+      ctx.strokeStyle = primaryColor;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      data.forEach((val, i) => {
+        const x = padding.left + (i / (dim - 1)) * chartW;
+        const y = padding.top + chartH - (val / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      
+      // 绘制数据点
+      ctx.fillStyle = primaryColor;
+      data.forEach((val, i) => {
+        if (val > 0) {
+          const x = padding.left + (i / (dim - 1)) * chartW;
+          const y = padding.top + chartH - (val / maxVal) * chartH;
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.fill();
+        }
+      });
+    }
+    
+    // 绘制年度柱状图
+    function renderYearChart() {
+      const canvas = document.getElementById('year-chart-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = rect.width - 32;
+      const displayHeight = 200;
+      canvas.width = displayWidth * dpr;
+      canvas.height = displayHeight * dpr;
+      canvas.style.width = displayWidth + 'px';
+      canvas.style.height = displayHeight + 'px';
+      ctx.scale(dpr, dpr);
+      
+      // 统计每月数据
+      const monthData = [];
+      let maxVal = 0;
+      for (let m = 1; m <= 12; m++) {
+        let monthTotal = 0;
+        const daysInMonth = new Date(currentYear, m, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
+          const ds = `${currentYear}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const st = statsByDate[ds];
+          if (st) monthTotal += st.userWords + st.aiWords;
+        }
+        monthData.push(monthTotal);
+        if (monthTotal > maxVal) maxVal = monthTotal;
+      }
+      if (maxVal === 0) maxVal = 10000;
+      
+      const padding = { top: 20, right: 20, bottom: 30, left: 50 };
+      const chartW = displayWidth - padding.left - padding.right;
+      const chartH = displayHeight - padding.top - padding.bottom;
+      
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+      
+      const style = getComputedStyle(document.body);
+      const primaryColor = style.getPropertyValue('--primary').trim() || '#e8b4b8';
+      const primaryLightColor = style.getPropertyValue('--primary-light').trim() || '#f5d5d8';
+      const textColor = style.getPropertyValue('--text-light').trim() || '#8a7a7a';
+      const borderColor = style.getPropertyValue('--border').trim() || '#f0e0e0';
+      
+      // 绘制网格线
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(displayWidth - padding.right, y);
+        ctx.stroke();
+      }
+      
+      // 绘制Y轴标签
+      ctx.fillStyle = textColor;
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * i;
+        const val = Math.round(maxVal * (4 - i) / 4);
+        ctx.fillText(formatWordCount(val), padding.left - 8, y + 4);
+      }
+      
+      // 绘制柱状图
+      const barWidth = (chartW - 24) / 12;
+      const gap = 2;
+      monthData.forEach((val, i) => {
+        const x = padding.left + i * barWidth + gap;
+        const barH = (val / maxVal) * chartH;
+        const y = padding.top + chartH - barH;
+        
+        // 绘制柱子
+        ctx.fillStyle = val > 0 ? primaryColor : primaryLightColor;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth - gap * 2, barH, 4);
+        ctx.fill();
+        
+        // 绘制月份标签
+        ctx.fillStyle = textColor;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText((i + 1) + '月', x + (barWidth - gap * 2) / 2, displayHeight - 8);
+      });
+    }
+    
+    // 更新窗口筛选下拉框
+    function updateConvFilterOptions() {
+      const select = document.getElementById('wordcloud-conv-filter');
+      if (!select) return;
+      select.innerHTML = '<option value="all">全部窗口</option>';
+      allConversations.forEach(conv => {
+        const title = (conv.title || '未命名对话').substring(0, 15) + ((conv.title || '').length > 15 ? '...' : '');
+        select.innerHTML += `<option value="${conv.id}">${escapeHtml(title)}</option>`;
+      });
+    }
+    
+    // 正向最大匹配分词
+    function segmentChinese(text, hideEnglish = false) {
+      const words = new Map();
+      
+      // 如果词典加载成功，使用正向最大匹配
+      if (dictLoaded && wordDict.size > 0) {
+        // 提取所有中文片段
+        const chineseSegments = text.match(/[\u4e00-\u9fa5]+/g) || [];
+        
+        for (const segment of chineseSegments) {
+          let i = 0;
+          while (i < segment.length) {
+            let matched = false;
+            // 从最长的词开始匹配（最大5个字）
+            for (let len = Math.min(5, segment.length - i); len >= 2; len--) {
+              const word = segment.substring(i, i + len);
+              if (wordDict.has(word)) {
+                // 找到词典中的词
+                if (!STOPWORDS.has(word) && !wordcloudBlacklist.includes(word)) {
+                  words.set(word, (words.get(word) || 0) + 1);
+                }
+                i += len;
+                matched = true;
+                break;
+              }
+            }
+            // 如果没有匹配到，跳过一个字
+            if (!matched) {
+              i++;
+            }
+          }
+        }
+      } else {
+        // 词典未加载，使用简单的2-4字提取（备用方案）
+        const chineseRegex = /[\u4e00-\u9fa5]{2,4}/g;
+        let match;
+        while ((match = chineseRegex.exec(text)) !== null) {
+          const word = match[0];
+          if (!STOPWORDS.has(word) && !wordcloudBlacklist.includes(word)) {
+            words.set(word, (words.get(word) || 0) + 1);
+          }
+        }
+      }
+      
+      // 提取英文单词(3字母以上)
+      if (!hideEnglish) {
+        const englishRegex = /[a-zA-Z]{3,}/g;
+        let match;
+        while ((match = englishRegex.exec(text)) !== null) {
+          const word = match[0].toLowerCase();
+          if (!STOPWORDS.has(word) && !wordcloudBlacklist.includes(word)) {
+            words.set(word, (words.get(word) || 0) + 1);
+          }
+        }
+      }
+      
+      return words;
+    }
+    
+    // 渲染词云
+    function renderWordCloud() {
+      const container = document.getElementById('wordcloud-container');
+      if (!container) return;
+      
+      const convFilter = document.getElementById('wordcloud-conv-filter')?.value || 'all';
+      const dateFilter = document.getElementById('wordcloud-date-filter')?.value || 'all';
+      const roleFilter = document.getElementById('wordcloud-role-filter')?.value || 'all';
+      const hideEnglish = document.getElementById('wordcloud-hide-english')?.checked || false;
+      
+      // 筛选消息 - 根据角色筛选
+      let filteredMsgs = allMessages.filter(m => m.type === 'normal');
+      
+      if (roleFilter === 'user') {
+        filteredMsgs = filteredMsgs.filter(m => m.role === 'user');
+      } else if (roleFilter === 'assistant') {
+        filteredMsgs = filteredMsgs.filter(m => m.role === 'assistant');
+      }
+      
+      if (convFilter !== 'all') {
+        filteredMsgs = filteredMsgs.filter(m => m.convId === convFilter);
+      }
+      
+      if (dateFilter === 'month') {
+        const monthStart = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
+        const monthEnd = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-31`;
+        filteredMsgs = filteredMsgs.filter(m => {
+          if (!m.time) return false;
+          const ds = formatDateKey(m.time);
+          return ds >= monthStart && ds <= monthEnd;
+        });
+      }
+      
+      if (filteredMsgs.length === 0) {
+        container.innerHTML = '<span class="wordcloud-empty">暂无数据</span>';
+        return;
+      }
+      
+      // 合并所有文本并分词
+      const allText = filteredMsgs.map(m => m.content).join(' ');
+      const wordCounts = segmentChinese(allText, hideEnglish);
+      
+      if (wordCounts.size === 0) {
+        container.innerHTML = '<span class="wordcloud-empty">暂无高频词</span>';
+        return;
+      }
+      
+      // 排序并取前50个
+      const sorted = Array.from(wordCounts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 50);
+      const maxCount = sorted[0][1];
+      const minCount = sorted[sorted.length - 1][1];
+      
+      // 渲染词云 - 点击显示删除按钮，再点删除才加黑名单
+      container.innerHTML = sorted.map(([word, count]) => {
+        let sizeClass;
+        const ratio = (count - minCount) / (maxCount - minCount + 1);
+        if (ratio > 0.8) sizeClass = 'size-5';
+        else if (ratio > 0.6) sizeClass = 'size-4';
+        else if (ratio > 0.4) sizeClass = 'size-3';
+        else if (ratio > 0.2) sizeClass = 'size-2';
+        else sizeClass = 'size-1';
+        return `<span class="wordcloud-word ${sizeClass}" data-word="${escapeHtml(word)}" onclick="toggleWordDeleteBtn(this)" title="${count}次"><span class="word-text">${escapeHtml(word)}</span><span class="word-delete-btn" onclick="event.stopPropagation(); confirmAddToBlacklist('${escapeJsString(word)}', this.parentElement)">×</span></span>`;
+      }).join('');
+    }
+    
+    // 聊天总览渲染
+    function renderOverview() {
+      renderOverviewSummary();
+      renderTopDays();
+      renderTopConversations();
+    }
+    
+    function renderOverviewSummary() {
+      const textEl = document.getElementById('overview-text');
+      if (!textEl || allMessages.length === 0) {
+        if (textEl) textEl.innerHTML = '还没有聊天记录哦~';
+        return;
+      }
+      
+      // 获取所有有消息的日期
+      const dates = Object.keys(statsByDate).sort();
+      if (dates.length === 0) {
+        textEl.innerHTML = '还没有聊天记录哦~';
+        return;
+      }
+      
+      const firstDate = dates[0];
+      const lastDate = dates[dates.length - 1];
+      const firstDateObj = new Date(firstDate);
+      const lastDateObj = new Date(lastDate);
+      const totalDays = Math.floor((lastDateObj - firstDateObj) / (1000 * 60 * 60 * 24)) + 1;
+      const chatDays = dates.length;
+      
+      // 计算总字数
+      let totalWords = 0;
+      dates.forEach(ds => {
+        const st = statsByDate[ds];
+        if (st) totalWords += st.userWords + st.aiWords;
+      });
+      const avgWordsPerDay = chatDays > 0 ? Math.round(totalWords / chatDays) : 0;
+      
+      // 计算最长连续聊天天数
+      let maxStreak = 1, currentStreak = 1;
+      for (let i = 1; i < dates.length; i++) {
+        const prevDate = new Date(dates[i - 1]);
+        const currDate = new Date(dates[i]);
+        const diffDays = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          currentStreak++;
+          if (currentStreak > maxStreak) maxStreak = currentStreak;
+        } else {
+          currentStreak = 1;
+        }
+      }
+      
+      // 统计每个小时的消息数量，找出最活跃时段
+      const hourCounts = new Array(24).fill(0);
+      let totalMsgCount = 0;
+      allMessages.forEach(msg => {
+        if (msg.time && (msg.type === 'normal' || !msg.type)) {
+          const hour = new Date(msg.time * 1000).getHours();
+          hourCounts[hour]++;
+          totalMsgCount++;
+        }
       });
       
-      const convList = Array.from(convMap.values());
+      // 找出连续3小时最活跃的时段
+      let maxHourSum = 0, peakStartHour = 0;
+      for (let i = 0; i < 24; i++) {
+        const sum = hourCounts[i] + hourCounts[(i + 1) % 24] + hourCounts[(i + 2) % 24];
+        if (sum > maxHourSum) {
+          maxHourSum = sum;
+          peakStartHour = i;
+        }
+      }
+      const peakEndHour = (peakStartHour + 3) % 24;
+      const peakPercent = totalMsgCount > 0 ? Math.round(maxHourSum / totalMsgCount * 100) : 0;
+      const peakTimeStr = `${String(peakStartHour).padStart(2, '0')}:00–${String(peakEndHour).padStart(2, '0')}:00`;
       
-      // 设置标题
-      document.getElementById('conv-select-title').textContent = formatDateFromKey(ds);
-      document.getElementById('conv-select-subtitle').textContent = `共 ${convList.length} 个对话窗口，${dm.length} 条消息`;
+      const firstDateStr = `${firstDateObj.getFullYear()}年${firstDateObj.getMonth() + 1}月${firstDateObj.getDate()}日`;
+      const lastDateStr = `${lastDateObj.getFullYear()}年${lastDateObj.getMonth() + 1}月${lastDateObj.getDate()}日`;
       
-      // 渲染窗口列表
-      const container = document.getElementById('conv-select-list');
-      container.innerHTML = convList.map(conv => {
-        return `<div class="conv-select-item" onclick="showConvMessagesForDate('${ds}', '${conv.convId}')">
-          <div class="conv-icon">💬</div>
-          <div class="conv-detail">
-            <div class="conv-name">${escapeHtml(conv.convTitle)}</div>
-            <div class="conv-stats">${conv.messageCount} 条消息 · 用户 ${conv.userCount} 条 · AI ${conv.aiCount} 条</div>
+      textEl.innerHTML = `我们从 <span class="highlight-num">${firstDateStr}</span> 聊到 <span class="highlight-num">${lastDateStr}</span>，共同走过了 <span class="highlight-num">${totalDays}</span> 天。<br>这期间，有 <span class="highlight-num">${chatDays}</span> 天都有我们的对话，每个活跃日平均要说上 <span class="highlight-num">${avgWordsPerDay.toLocaleString()}</span> 字。<br>我们最喜欢在 <span class="highlight-num">${peakTimeStr}</span> 谈话，那段时光占据了所有对话的 <span class="highlight-num">${peakPercent}%</span>。<br>最长的一次，我们连续聊了 <span class="highlight-num">${maxStreak}</span> 天都没有停下。`;
+    }
+    
+    function renderTopDays() {
+      const container = document.getElementById('top-days-list');
+      if (!container) return;
+      
+      // 按字数排序日期
+      const dayStats = Object.entries(statsByDate).map(([date, st]) => ({
+        date,
+        words: st.userWords + st.aiWords,
+        count: st.count
+      })).sort((a, b) => b.words - a.words).slice(0, 10);
+      
+      if (dayStats.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light);">暂无数据</div>';
+        return;
+      }
+      
+      container.innerHTML = dayStats.map((item, i) => {
+        return `<div class="ranking-item" onclick="showDayMessages('${item.date}')">
+          <span class="rank-num">#${i + 1}</span>
+          <div class="rank-info">
+            <div class="rank-title">${formatDateFromKey(item.date)}</div>
+            <div class="rank-meta">${formatWordCount(item.words)} · ${item.count}条消息</div>
           </div>
-          <div class="conv-arrow">›</div>
         </div>`;
       }).join('');
+    }
+    
+    function renderTopConversations() {
+      const container = document.getElementById('top-convs-list');
+      if (!container) return;
       
-      // 保存当前选择的日期，供返回时使用
+      // 按字数排序对话
+      const convStats = allConversations.map(conv => {
+        const stats = conversationStats[conv.id] || { totalChars: 0, messageCount: 0 };
+        return {
+          id: conv.id,
+          title: conv.title || '未命名对话',
+          words: stats.totalChars,
+          count: stats.messageCount
+        };
+      }).sort((a, b) => b.words - a.words).slice(0, 10);
+      
+      if (convStats.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light);">暂无数据</div>';
+        return;
+      }
+      
+      container.innerHTML = convStats.map((item, i) => {
+        const shortTitle = item.title.length > 15 ? item.title.substring(0, 15) + '...' : item.title;
+        return `<div class="ranking-item" onclick="openConversation('${item.id}')">
+          <span class="rank-num">#${i + 1}</span>
+          <div class="rank-info">
+            <div class="rank-title">${escapeHtml(shortTitle)}</div>
+            <div class="rank-meta">${formatNumber(item.words)}字 · ${item.count}条消息</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    function randomJumpToMoment() {
+      // 筛选出所有普通消息（排除系统消息和记忆消息）
+      const normalMessages = allMessages.filter(m => m.type === 'normal' || !m.type);
+      if (normalMessages.length === 0) {
+        showToast('还没有聊天记录哦');
+        return;
+      }
+      // 随机选择一条消息
+      const randomMsg = normalMessages[Math.floor(Math.random() * normalMessages.length)];
+      const convId = randomMsg.convId;
+      const msgId = randomMsg.id;
+      
+      // 打开对话并定位到那条消息
+      openConversation(convId, null, true);
+      setTimeout(() => {
+        const el = document.getElementById(`msg-${msgId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 3000);
+        }
+      }, 300);
+      
+      // 显示提示
+      const timeStr = randomMsg.time ? formatFullDateTime(randomMsg.time) : '';
+      const roleStr = randomMsg.role === 'user' ? '你说的' : 'AI说的';
+      showToast(`🎲 随机到了 ${timeStr} ${roleStr}一句话~`);
+    }
+    
+    function showDayMessages(ds) { 
+      const dm = messagesByDate[ds]; 
+      if (!dm || dm.length === 0) { showToast('这天没有消息'); return; }
+      const convMap = new Map();
+      dm.forEach(msg => {
+        if (!convMap.has(msg.convId)) { convMap.set(msg.convId, { convId: msg.convId, convTitle: msg.convTitle, messageCount: 0, userCount: 0, aiCount: 0 }); }
+        const info = convMap.get(msg.convId);
+        info.messageCount++;
+        if (msg.role === 'user') info.userCount++; else if (msg.role === 'assistant') info.aiCount++;
+      });
+      const convList = Array.from(convMap.values());
+      document.getElementById('conv-select-title').textContent = formatDateFromKey(ds);
+      document.getElementById('conv-select-subtitle').textContent = `共 ${convList.length} 个对话窗口，${dm.length} 条消息`;
+      const container = document.getElementById('conv-select-list');
+      container.innerHTML = convList.map(conv => {
+        return `<div class="conv-select-item" onclick="showConvMessagesForDate('${ds}', '${conv.convId}')"><div class="conv-icon">💬</div><div class="conv-detail"><div class="conv-name">${escapeHtml(conv.convTitle)}</div><div class="conv-stats">${conv.messageCount} 条消息 · 用户 ${conv.userCount} 条 · AI ${conv.aiCount} 条</div></div><div class="conv-arrow">›</div></div>`;
+      }).join('');
       window.currentSelectedDate = ds;
-      
       switchView('conv-select'); 
     }
 
-    // ★ 新增：显示指定窗口在指定日期的消息
     function showConvMessagesForDate(ds, convId) {
       const dm = messagesByDate[ds];
-      if (!dm || dm.length === 0) {
-        showToast('没有找到消息');
-        return;
-      }
-      
-      // 筛选出该窗口在该日期的消息
+      if (!dm || dm.length === 0) { showToast('没有找到消息'); return; }
       const filteredMessages = dm.filter(msg => msg.convId === convId);
-      
-      if (filteredMessages.length === 0) {
-        showToast('该窗口在这天没有消息');
-        return;
-      }
-      
-      // 按时间排序
+      if (filteredMessages.length === 0) { showToast('该窗口在这天没有消息'); return; }
       filteredMessages.sort((a, b) => (a.time || 0) - (b.time || 0));
-      
-      // 获取窗口标题
       const convTitle = filteredMessages[0].convTitle || '未命名对话';
-      
       document.getElementById('day-messages-title').textContent = `${formatDateFromKey(ds)}`;
       document.getElementById('day-messages-subtitle').textContent = `${convTitle} · 共 ${filteredMessages.length} 条消息`;
-      
       renderMessages(filteredMessages, document.getElementById('day-messages-container'), false);
-      
-      // 保存状态供返回使用
       window.currentSelectedDate = ds;
       window.currentSelectedConvId = convId;
-      
       switchView('day-messages');
+      applyPattern();
     }
 
-    // ★ 新增：从消息详情页返回到窗口选择页
-    function backToConvSelect() {
-      if (window.currentSelectedDate) {
-        showDayMessages(window.currentSelectedDate);
-      } else {
-        switchView('timeline');
-      }
-    }
+    function backToConvSelect() { if (window.currentSelectedDate) { showDayMessages(window.currentSelectedDate); } else { switchView('timeline'); } }
     
     function renderTimeline() { const c = document.getElementById('timeline-list'), dates = Object.keys(statsByDate).sort().reverse(); if (dates.length === 0) { c.innerHTML = '<div class="empty-state"><div class="icon">📅</div><p>还没有对话数据~</p></div>'; return; } c.innerHTML = dates.map(d => { const st = statsByDate[d], total = st.userWords + st.aiWords; return `<div class="timeline-date-item" onclick="showDayMessages('${d}')"><span class="date">${formatDateFromKey(d)}</span><span class="count">${st.count}条消息 · ${formatWordCount(total)}</span></div>`; }).join(''); }
     
-    // ★ 修改：switchView 新增 conv-select 视图
     function switchView(view) { 
       document.querySelectorAll('.drawer-menu-item').forEach(el => el.classList.toggle('active', el.dataset.view === view)); 
       document.getElementById('view-upload').style.display = 'none'; 
@@ -958,25 +2352,12 @@
           else if (allConversations.length > 0) openConversation(allConversations[0].id); 
           else document.getElementById('view-upload').style.display = 'flex'; 
           break; 
-        case 'chat': 
-          document.getElementById('view-chat').classList.add('show'); 
-          break; 
-        case 'favorites': 
-          document.getElementById('view-favorites').classList.add('show'); 
-          renderFavorites(); 
-          break; 
-        case 'stats': 
-          document.getElementById('view-stats').classList.add('show'); 
-          break; 
-        case 'timeline': 
-          document.getElementById('view-timeline').classList.add('show'); 
-          break; 
-        case 'day-messages': 
-          document.getElementById('view-day-messages').classList.add('show'); 
-          break; 
-        case 'conv-select':
-          document.getElementById('view-conv-select').classList.add('show');
-          break;
+        case 'chat': document.getElementById('view-chat').classList.add('show'); break; 
+        case 'favorites': document.getElementById('view-favorites').classList.add('show'); renderFavorites(); break; 
+        case 'stats': document.getElementById('view-stats').classList.add('show'); break; 
+        case 'timeline': document.getElementById('view-timeline').classList.add('show'); break; 
+        case 'day-messages': document.getElementById('view-day-messages').classList.add('show'); break; 
+        case 'conv-select': document.getElementById('view-conv-select').classList.add('show'); break;
       } 
       toggleDrawer(false); 
     }
@@ -986,7 +2367,7 @@
     function showModal(icon, title, message, onConfirm, isDanger = false) { document.getElementById('modal-icon').textContent = icon; document.getElementById('modal-title').textContent = title; document.getElementById('modal-message').textContent = message; document.getElementById('modal-confirm-btn').className = isDanger ? 'modal-btn confirm' : 'modal-btn primary'; modalConfirmCallback = onConfirm; document.getElementById('modal-overlay').classList.add('show'); }
     function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); modalConfirmCallback = null; }
     async function confirmModalAction() { if (modalConfirmCallback) { const cb = modalConfirmCallback; closeModal(); await cb(); } }
-    function showClearDataModal() { showModal('⚠️', '清除所有数据', '确定要清除所有数据吗？\n这将删除所有对话和收藏，无法恢复！', async () => { showLoading('正在清除数据...'); try { await clearAllDataFromDb(); allConversations = []; filteredConversations = []; allMessages = []; messagesByDate = {}; favorites = new Set(); statsByDate = {}; conversationStats = {}; currentConvId = null; currentConvIndex = -1; currentMessages = []; renderConversationList(); updateDrawerSubtitle(); document.getElementById('view-upload').style.display = 'flex'; document.getElementById('view-chat').classList.remove('show'); toggleDrawer(false); showToast('已清除所有数据'); } catch (e) { console.error('清除失败', e); showToast('清除失败，请重试'); } hideLoading(); }, true); }
+    function showClearDataModal() { showModal('⚠️', '清除所有数据', '确定要清除所有数据吗？\n这将删除所有对话和收藏，无法恢复！', async () => { showLoading('正在清除数据...'); try { await clearAllDataFromDb(); allConversations = []; filteredConversations = []; allMessages = []; messagesByDate = {}; favorites = new Map(); statsByDate = {}; conversationStats = {}; currentConvId = null; currentConvIndex = -1; currentMessages = []; renderConversationList(); updateDrawerSubtitle(); document.getElementById('view-upload').style.display = 'flex'; document.getElementById('view-chat').classList.remove('show'); toggleDrawer(false); showToast('已清除所有数据'); } catch (e) { console.error('清除失败', e); showToast('清除失败，请重试'); } hideLoading(); }, true); }
     function showLoading(text) { document.getElementById('loading-text').textContent = text || '加载中...'; document.getElementById('loading-overlay').classList.add('show'); }
     function hideLoading() { document.getElementById('loading-overlay').classList.remove('show'); }
     function showToast(message) { const t = document.getElementById('toast'); t.textContent = message; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
