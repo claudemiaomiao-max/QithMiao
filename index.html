@@ -496,9 +496,6 @@
     .star-btn { background: none; border: none; cursor: pointer; font-size: 1rem; opacity: 0.4; transition: all 0.2s; padding: 2px; }
     .star-btn:hover { opacity: 0.8; }
     .star-btn.active { opacity: 1; color: var(--star-active); }
-    .msg-delete-btn { background: none; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0; transition: all 0.2s; padding: 2px 6px; color: var(--text-light); border-radius: 4px; }
-    .message:hover .msg-delete-btn { opacity: 0.5; }
-    .msg-delete-btn:hover { opacity: 1; color: var(--danger); background: var(--danger-light); }
     .view-global-search { display: none; flex-direction: column; height: calc(100vh - 64px); }
     .view-global-search.show { display: flex; }
     .global-search-header { padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
@@ -746,6 +743,77 @@
     .message-bubble pre code { white-space: pre; }
     .message-bubble a { color: var(--primary); text-decoration: underline; }
     mark.kw-highlight { background: var(--highlight-bg); padding: 1px 2px; border-radius: 2px; }
+
+    /* 代码块复制按钮 */
+    .message-bubble pre { position: relative; }
+    .code-copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: rgba(255,255,255,0.85);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      color: var(--text);
+      font-size: 0.75rem;
+      padding: 0;
+    }
+    .message-bubble pre:hover .code-copy-btn { opacity: 0.7; }
+    .code-copy-btn:hover { opacity: 1 !important; background: rgba(255,255,255,1); }
+    .code-copy-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+    .code-copy-btn.copied { color: #22c55e; }
+    .code-copy-btn.copied svg { stroke: #22c55e; }
+    [data-theme="dark"] .code-copy-btn { background: rgba(60,60,60,0.85); }
+    [data-theme="dark"] .code-copy-btn:hover { background: rgba(80,80,80,1); }
+
+    /* 消息复制按钮 */
+    .msg-copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px 6px;
+      opacity: 0.4;
+      transition: all 0.2s;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .msg-copy-btn:hover { opacity: 1; color: var(--primary-dark); }
+    .msg-copy-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+    .msg-copy-btn.copied { color: #22c55e; }
+    .msg-copy-btn.copied svg { stroke: #22c55e; }
+
+    /* 消息删除按钮优化 - X图标放右上角 */
+    .message-body { position: relative; }
+    .msg-delete-x {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border: none;
+      background: var(--danger-light);
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--danger);
+      transition: all 0.2s;
+      z-index: 10;
+      line-height: 1;
+    }
+    .msg-delete-x:hover { background: var(--danger); color: white; }
+    .message.show-delete .msg-delete-x { display: flex; }
 
   </style>
 </head>
@@ -1027,6 +1095,7 @@
       '只手', '只眼', '只脚', '另一只', '另一只手',
       '怀里', '手里', '心里', '眼里', '脑子里', '嘴里',
       '情绪', '感情', '心情', '状态',
+      '小姐', '先生', '同学', '朋友', '老师',
       // 英文停用词
       'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'and', 'but', 'if', 'or', 'because', 'until', 'while', 'although', 'though', 'this', 'that', 'these', 'those', 'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'am', 'about', 'like', 'just', 'know', 'think', 'want', 'see', 'come', 'go', 'get', 'make', 'say', 'tell', 'ask', 'use', 'find', 'give', 'take', 'need', 'feel', 'try', 'let', 'put', 'mean', 'keep', 'begin', 'seem', 'help', 'show', 'hear', 'play', 'run', 'move', 'live', 'believe', 'hold', 'bring', 'happen', 'write', 'provide', 'sit', 'stand', 'lose', 'pay', 'meet', 'include', 'continue', 'set', 'learn', 'change', 'lead', 'understand', 'watch', 'follow', 'stop', 'create', 'speak', 'read', 'allow', 'add', 'spend', 'grow', 'open', 'walk', 'win', 'offer', 'remember', 'love', 'consider', 'appear', 'buy', 'wait', 'serve', 'die', 'send', 'expect', 'build', 'stay', 'fall', 'cut', 'reach', 'kill', 'remain', 'yeah', 'yes', 'okay', 'ok', 'oh', 'um', 'uh', 'well', 'like', 'really', 'actually', 'basically', 'literally', 'honestly', 'seriously'
     ]);
@@ -1613,18 +1682,96 @@
         let dc = renderMarkdown(msg.content); if (highlightKw) dc = highlightKeywordInHtml(dc, highlightKw);
         if (msg.type === 'custom_instructions') { html += `<div class="message system" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">⚙️</div></div><div class="message-body"><div class="message-bubble"><span class="system-label">📋 窗口自定义指令</span><div style="white-space: pre-wrap;">${dc}</div></div></div></div>`; }
         else if (msg.type === 'memory_update' || msg.type === 'memory_call') { html += `<div class="message memory" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">🧠</div></div><div class="message-body"><div class="message-bubble"><span class="memory-label">💾 记忆库操作</span><div style="white-space: pre-wrap;">${dc}</div></div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span></div></div></div>`; }
-        else { 
-          const isFav = favorites.has(msg.id), mb = msg.model ? `<span class="message-model">${formatModelName(msg.model)}</span>` : '', an = msg.role === 'user' ? userName : aiName; 
+        else {
+          const isFav = favorites.has(msg.id), mb = msg.model ? `<span class="message-model">${formatModelName(msg.model)}</span>` : '', an = msg.role === 'user' ? userName : aiName;
           const convIdForFav = msg.convId || currentConvId;
-          const avatarContent = msg.role === 'user' 
+          const avatarContent = msg.role === 'user'
             ? (appSettings.userAvatar ? `<img src="${appSettings.userAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '🧸')
             : (appSettings.aiAvatar ? `<img src="${appSettings.aiAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '🤖');
-          html += `<div class="message ${msg.role}" id="msg-${msg.id}" data-date="${ds}"><div class="message-avatar-wrapper"><div class="message-avatar">${avatarContent}</div>${an ? `<span class="avatar-name">${escapeHtml(an)}</span>` : ''}</div><div class="message-body"><div class="message-bubble">${dc}</div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span>${mb}<button class="star-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${msg.id}', '${convIdForFav}', this)">${isFav ? '⭐' : '☆'}</button><button class="msg-delete-btn" onclick="showDeleteMsgModal('${msg.id}', '${convIdForFav}')" title="删除此消息">🗑</button></div></div></div>`; 
+          const copyIcon = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+          html += `<div class="message ${msg.role}" id="msg-${msg.id}" data-date="${ds}" data-content="${escapeHtml(msg.content).replace(/"/g, '&quot;')}"><div class="message-avatar-wrapper"><div class="message-avatar">${avatarContent}</div>${an ? `<span class="avatar-name">${escapeHtml(an)}</span>` : ''}</div><div class="message-body"><button class="msg-delete-x" onclick="event.stopPropagation(); showDeleteMsgModal('${msg.id}', '${convIdForFav}')" title="删除此消息">×</button><div class="message-bubble">${dc}</div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span>${mb}<button class="star-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${msg.id}', '${convIdForFav}', this)">${isFav ? '⭐' : '☆'}</button><button class="msg-copy-btn" onclick="copyMessageToClipboard(this)" title="复制消息">${copyIcon}</button></div></div></div>`;
         }
       });
       tc.innerHTML = html;
+      // 添加代码块复制按钮
+      addCodeCopyButtons(tc);
+      // 添加消息点击事件，用于显示删除按钮
+      addMessageClickHandlers(tc);
     }
     function formatModelName(m) { const mm = { 'gpt-4': 'GPT-4', 'gpt-4o': 'GPT-4o', 'gpt-4o-mini': 'GPT-4o mini', 'gpt-4-turbo': 'GPT-4 Turbo', 'gpt-3.5-turbo': 'GPT-3.5', 'text-davinci-002-render-sha': 'GPT-3.5', 'gpt-4-gizmo': 'GPT-4 (GPTs)', 'o1-preview': 'o1-preview', 'o1-mini': 'o1-mini' }; return mm[m] || m; }
+
+    // 代码块复制按钮功能
+    function addCodeCopyButtons(container) {
+      const copyIcon = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+      const checkIcon = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      container.querySelectorAll('.message-bubble pre').forEach(pre => {
+        const btn = document.createElement('button');
+        btn.className = 'code-copy-btn';
+        btn.innerHTML = copyIcon;
+        btn.title = '复制代码';
+        btn.onclick = async (e) => {
+          e.stopPropagation();
+          const code = pre.querySelector('code');
+          const text = code ? code.textContent : pre.textContent;
+          try {
+            await navigator.clipboard.writeText(text);
+            btn.innerHTML = checkIcon;
+            btn.classList.add('copied');
+            setTimeout(() => {
+              btn.innerHTML = copyIcon;
+              btn.classList.remove('copied');
+            }, 1500);
+          } catch (err) {
+            showToast('复制失败');
+          }
+        };
+        pre.appendChild(btn);
+      });
+    }
+
+    // 消息复制功能
+    function copyMessageToClipboard(btn) {
+      const msg = btn.closest('.message');
+      const content = msg?.dataset?.content;
+      if (!content) { showToast('复制失败'); return; }
+      const copyIcon = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+      const checkIcon = `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      navigator.clipboard.writeText(content).then(() => {
+        btn.innerHTML = checkIcon;
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = copyIcon;
+          btn.classList.remove('copied');
+        }, 1500);
+      }).catch(() => showToast('复制失败'));
+    }
+
+    // 消息点击事件，用于显示删除按钮
+    let messageClickHandlerInitialized = false;
+    function addMessageClickHandlers(container) {
+      container.querySelectorAll('.message.user, .message.assistant').forEach(msg => {
+        msg.addEventListener('click', (e) => {
+          // 如果点击的是按钮或链接，不处理
+          if (e.target.closest('button') || e.target.closest('a')) return;
+          // 切换当前消息的显示状态
+          const wasShowing = msg.classList.contains('show-delete');
+          // 先移除所有消息的show-delete
+          document.querySelectorAll('.message.show-delete').forEach(m => m.classList.remove('show-delete'));
+          // 如果之前没显示，则显示
+          if (!wasShowing) msg.classList.add('show-delete');
+        });
+      });
+      // 点击其他区域时隐藏删除按钮（只添加一次）
+      if (!messageClickHandlerInitialized) {
+        messageClickHandlerInitialized = true;
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.message')) {
+            document.querySelectorAll('.message.show-delete').forEach(m => m.classList.remove('show-delete'));
+          }
+        });
+      }
+    }
+
     function renderChatTimeline() { const nav = document.getElementById('timeline-nav'), dates = [...new Set(currentMessages.filter(m => m.time).map(m => formatDateKey(m.time)))]; if (dates.length <= 1) { nav.classList.remove('show'); return; } nav.innerHTML = dates.map(d => `<button class="timeline-btn" onclick="scrollToDate('${d}')">${formatDateShort(d)}</button>`).join(''); nav.classList.add('show'); }
     function scrollToDate(ds) { const d = document.getElementById(`date-${ds}`); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     
