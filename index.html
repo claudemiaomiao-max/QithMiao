@@ -182,6 +182,37 @@
       --pattern-color: rgba(168, 197, 160, 0.15);
       --pattern-color-dark: rgba(168, 197, 160, 0.25);
     }
+    [data-theme="red"] {
+      --primary: #d42b2f;
+      --primary-dark: #A20609;
+      --primary-light: #fce4e4;
+      --bg: #fdf6f6;
+      --bg-card: #ffffff;
+      --text: #4a1a1a;
+      --text-light: #8a4a4a;
+      --border: #f0cccc;
+      --user-bubble: #c41e22;
+      --user-text: #ffffff;
+      --ai-bubble: #fdf0f0;
+      --ai-text: #4a1a1a;
+      --heat-1: #fdf0f0;
+      --heat-2: #f5cccc;
+      --heat-3: #d45555;
+      --heat-4: #A20609;
+      --danger: #d47f7f;
+      --danger-light: #faeeee;
+      --system-bg: #fdf0f0;
+      --system-border: #d42b2f;
+      --system-text: #6a2a2a;
+      --memory-bg: #fdf0f0;
+      --memory-border: #d42b2f;
+      --memory-text: #6a2a2a;
+      --avatar-ai-bg: #ffffff;
+      --highlight-bg: #fce8e8;
+      --highlight-border: #f0cccc;
+      --pattern-color: rgba(162, 6, 9, 0.1);
+      --pattern-color-dark: rgba(162, 6, 9, 0.2);
+    }
     [data-theme="dark"] {
       --primary: #7c9db8;
       --primary-dark: #5a7a94;
@@ -276,6 +307,7 @@
     .theme-dot.blue { background: linear-gradient(135deg, #94A0D3 0%, #7b89c4 100%); }
     .theme-dot.purple { background: linear-gradient(135deg, #c4b5d4 0%, #a594b8 100%); }
     .theme-dot.green { background: linear-gradient(135deg, #a8c5a0 0%, #8fb087 100%); }
+    .theme-dot.red { background: linear-gradient(135deg, #d42b2f 0%, #A20609 100%); }
     .theme-dot.dark { background: linear-gradient(135deg, #3d4a54 0%, #1a1d21 100%); }
     .fontsize-selector { display: flex; gap: 8px; justify-content: center; align-items: center; }
     .fontsize-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; }
@@ -939,7 +971,7 @@
   <div class="modal-overlay" id="settings-overlay"><div class="settings-panel"><div class="settings-title"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>设置</div>
   <div class="settings-section"><label class="settings-label">昵称设置</label><div class="settings-row"><div class="settings-field"><input type="text" class="settings-input" id="settings-user-name" placeholder="用户昵称"></div><div class="settings-field"><input type="text" class="settings-input" id="settings-ai-name" placeholder="助手昵称"></div></div></div>
   <div class="settings-section"><label class="settings-label">自定义头像</label><div class="avatar-upload-section"><div class="avatar-upload-item"><div class="avatar-upload-preview" id="user-avatar-preview" onclick="document.getElementById('user-avatar-input').click()">🧸<span class="avatar-delete" onclick="event.stopPropagation(); deleteAvatar('user')">×</span></div><span class="avatar-upload-label">用户</span><input type="file" id="user-avatar-input" class="avatar-upload-input" accept="image/*" onchange="handleAvatarUpload(event, 'user')"></div><div class="avatar-upload-item"><div class="avatar-upload-preview" id="ai-avatar-preview" onclick="document.getElementById('ai-avatar-input').click()">🤖<span class="avatar-delete" onclick="event.stopPropagation(); deleteAvatar('ai')">×</span></div><span class="avatar-upload-label">助手</span><input type="file" id="ai-avatar-input" class="avatar-upload-input" accept="image/*" onchange="handleAvatarUpload(event, 'ai')"></div></div></div>
-  <div class="settings-section"><label class="settings-label">主题颜色</label><div class="theme-selector"><div class="theme-dot pink active" data-theme="pink" onclick="selectTheme('pink')" title="樱花粉"></div><div class="theme-dot brown" data-theme="brown" onclick="selectTheme('brown')" title="奶茶棕"></div><div class="theme-dot blue" data-theme="blue" onclick="selectTheme('blue')" title="雾霾蓝"></div><div class="theme-dot purple" data-theme="purple" onclick="selectTheme('purple')" title="香芋紫"></div><div class="theme-dot green" data-theme="green" onclick="selectTheme('green')" title="抹茶绿"></div><div class="theme-dot dark" data-theme="dark" onclick="selectTheme('dark')" title="夜间模式"></div></div></div>
+  <div class="settings-section"><label class="settings-label">主题颜色</label><div class="theme-selector"><div class="theme-dot pink active" data-theme="pink" onclick="selectTheme('pink')" title="樱花粉"></div><div class="theme-dot brown" data-theme="brown" onclick="selectTheme('brown')" title="奶茶棕"></div><div class="theme-dot blue" data-theme="blue" onclick="selectTheme('blue')" title="雾霾蓝"></div><div class="theme-dot purple" data-theme="purple" onclick="selectTheme('purple')" title="香芋紫"></div><div class="theme-dot green" data-theme="green" onclick="selectTheme('green')" title="抹茶绿"></div><div class="theme-dot red" data-theme="red" onclick="selectTheme('red')" title="深红"></div><div class="theme-dot dark" data-theme="dark" onclick="selectTheme('dark')" title="夜间模式"></div></div></div>
   <div class="settings-section"><label class="settings-label">聊天背景</label><div class="pattern-selector"><div class="pattern-option none active" data-pattern="none" onclick="selectPattern('none')" title="无"><div class="pattern-preview"></div></div><div class="pattern-option grid" data-pattern="grid" onclick="selectPattern('grid')" title="格纹"><div class="pattern-preview"></div></div><div class="pattern-option dots" data-pattern="dots" onclick="selectPattern('dots')" title="波点"><div class="pattern-preview"></div></div><div class="pattern-option stripes" data-pattern="stripes" onclick="selectPattern('stripes')" title="条纹"><div class="pattern-preview"></div></div><div class="pattern-option custom" data-pattern="custom" onclick="handleCustomBgClick()" title="自定义"><div class="pattern-preview" id="custom-bg-preview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><span class="bg-delete" onclick="event.stopPropagation(); deleteCustomBg()">×</span></div><input type="file" id="bg-upload-input" class="avatar-upload-input" accept="image/*" onchange="handleBgUpload(event)"></div></div>
   <div class="settings-section"><label class="settings-label">聊天字体</label><select class="font-selector" id="settings-font" onchange="selectFont(this.value)"><option value="system">系统默认</option><option value="naikai">内海简体</option><option value="moonstars">月星楷</option><option value="jason">清松手写体</option><option value="pingfang">平方时光体</option><option value="cococheese">小可奶酪体</option><option value="zcool">站酷快乐体</option><option value="ZZJmarkpen">宅在家麦克笔</option><option value="ZLabsBitmap">ZLabsBitmap像素</option><option value="KURIYAMAKOUCHI">栗山巧緻フォント</option></select></div>
   <div class="settings-section"><label class="settings-label">字体大小</label><div class="fontsize-selector"><input type="range" class="fontsize-slider" id="fontsize-slider" min="12" max="18" value="14" oninput="selectFontSizeBySlider(this.value)"></div></div><div class="settings-buttons"><button class="modal-btn primary" onclick="saveSettings()">保存</button><button class="modal-btn cancel" onclick="closeSettings()">取消</button></div></div></div>
