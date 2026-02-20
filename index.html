@@ -1180,7 +1180,7 @@
     let allConversations = [], filteredConversations = [], conversationStats = {}, currentConvIndex = -1, currentConvId = null, currentMessages = [], allMessages = [], messagesByDate = {}, favorites = new Map(), statsByDate = {};
     let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
     let isSelectMode = false, selectedConvIds = new Set(), isFavSelectMode = false, selectedFavMsgIds = new Set(), modalConfirmCallback = null;
-    const PAGE_SIZE = 500;
+    const PAGE_SIZE = 2000;
     let paginationState = { messages: [], renderedCount: 0, highlightKw: null, showConvTitle: false, isPaginated: false };
     let searchMode = 'current', globalSearchResults = [], currentSearchResultIndex = -1, flatSearchResults = [], isHeaderCollapsed = false;
     let appSettings = { userName: '', aiName: '', theme: 'pink', fontSize: 14, pattern: 'none', userAvatar: '', aiAvatar: '', customBg: '', fontFamily: 'system' };
