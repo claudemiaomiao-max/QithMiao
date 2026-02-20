@@ -917,6 +917,9 @@
     .message.show-delete .msg-delete-x { display: flex; }
 
     /* 触屏设备：禁用hover效果，解决Safari双击问题 */
+    .load-more-container { text-align: center; padding: 20px 16px 40px; }
+    .load-more-btn { padding: 12px 32px; border: 2px solid var(--primary); border-radius: 24px; background: var(--bg-card); color: var(--primary-dark); font-size: var(--font-size-base); cursor: pointer; transition: all 0.2s; font-weight: 500; }
+    .load-more-btn:active { background: var(--primary); color: white; }
     @media (hover: none) and (pointer: coarse) {
       .conv-item:hover { border-color: transparent; }
       .conv-item:hover .conv-delete-btn { display: none; }
@@ -1177,6 +1180,8 @@
     let allConversations = [], filteredConversations = [], conversationStats = {}, currentConvIndex = -1, currentConvId = null, currentMessages = [], allMessages = [], messagesByDate = {}, favorites = new Map(), statsByDate = {};
     let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
     let isSelectMode = false, selectedConvIds = new Set(), isFavSelectMode = false, selectedFavMsgIds = new Set(), modalConfirmCallback = null;
+    const PAGE_SIZE = 500;
+    let paginationState = { messages: [], renderedCount: 0, highlightKw: null, showConvTitle: false, isPaginated: false };
     let searchMode = 'current', globalSearchResults = [], currentSearchResultIndex = -1, flatSearchResults = [], isHeaderCollapsed = false;
     let appSettings = { userName: '', aiName: '', theme: 'pink', fontSize: 14, pattern: 'none', userAvatar: '', aiAvatar: '', customBg: '', fontFamily: 'system' };
     let currentSearchKeyword = '';
@@ -1681,7 +1686,15 @@
       openConversation(convId, keyword, true);
       document.getElementById('view-global-search').classList.remove('show'); 
       document.getElementById('view-chat').classList.add('show');
-      setTimeout(() => { const el = document.getElementById(`msg-${msgId}`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); } }, 300);
+      setTimeout(() => {
+        let el = document.getElementById(`msg-${msgId}`);
+        if (!el && paginationState.isPaginated) {
+          const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
+          if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
+          el = document.getElementById(`msg-${msgId}`);
+        }
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); }
+      }, 300);
     }
     
     function navigateSearchResult(dir) {
@@ -1696,7 +1709,13 @@
     function highlightCurrentSearchResult() {
       document.querySelectorAll('.message.highlight').forEach(el => el.classList.remove('highlight'));
       if (currentSearchResultIndex < 0 || currentSearchResultIndex >= flatSearchResults.length) return;
-      const r = flatSearchResults[currentSearchResultIndex], el = document.getElementById(`msg-${r.msgId}`);
+      const r = flatSearchResults[currentSearchResultIndex];
+      let el = document.getElementById(`msg-${r.msgId}`);
+      if (!el && paginationState.isPaginated) {
+        const targetIdx = paginationState.messages.findIndex(m => m.id === r.msgId);
+        if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
+        el = document.getElementById(`msg-${r.msgId}`);
+      }
       if (el) { el.classList.add('highlight'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       document.getElementById('search-result-count').textContent = `${currentSearchResultIndex + 1} / ${flatSearchResults.length}`;
     }
@@ -1882,10 +1901,8 @@
       applyPattern();
     }
     
-    function renderMessages(messages, container = null, showConvTitle = false, highlightKw = null) {
-      const tc = container || document.getElementById('chat-messages');
-      if (messages.length === 0) { tc.innerHTML = '<div class="empty-state"><div class="icon">💬</div><p>没有消息~</p></div>'; return; }
-      let html = '', lastDate = '', lastConvId = '';
+    function renderMessageBatch(messages, showConvTitle, highlightKw, lastDate = '', lastConvId = '') {
+      let html = '';
       const userName = appSettings.userName || '', aiName = appSettings.aiName || '';
       messages.forEach(msg => {
         const ds = msg.time ? formatDateKey(msg.time) : '';
@@ -1904,13 +1921,67 @@
           html += `<div class="message ${msg.role}" id="msg-${msg.id}" data-date="${ds}" data-content="${escapeHtml(msg.content).replace(/"/g, '&quot;')}"><div class="message-avatar-wrapper"><div class="message-avatar">${avatarContent}</div>${an ? `<span class="avatar-name">${escapeHtml(an)}</span>` : ''}</div><div class="message-body"><button class="msg-delete-x" onclick="event.stopPropagation(); showDeleteMsgModal('${msg.id}', '${convIdForFav}')" title="删除此消息">×</button><div class="message-bubble">${dc}</div><div class="message-footer"><span class="message-time">${msg.time ? formatFullDateTime(msg.time) : ''}</span>${mb}<button class="star-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${msg.id}', '${convIdForFav}', this)">${isFav ? '⭐' : '☆'}</button><button class="msg-copy-btn" onclick="copyMessageToClipboard(this)" title="复制消息">${copyIcon}</button></div></div></div>`;
         }
       });
-      tc.innerHTML = html;
-      // 添加代码块复制按钮
+      return { html, lastDate, lastConvId };
+    }
+
+    function renderMessages(messages, container = null, showConvTitle = false, highlightKw = null, forceCount = 0) {
+      const tc = container || document.getElementById('chat-messages');
+      if (messages.length === 0) { tc.innerHTML = '<div class="empty-state"><div class="icon">💬</div><p>没有消息~</p></div>'; paginationState.isPaginated = false; return; }
+      const isMainContainer = !container;
+      const initialCount = forceCount > 0 ? Math.min(forceCount, messages.length) : (isMainContainer && messages.length > PAGE_SIZE ? PAGE_SIZE : messages.length);
+      const isPaginated = isMainContainer && initialCount < messages.length;
+      if (isMainContainer) {
+        paginationState = { messages, renderedCount: initialCount, highlightKw, showConvTitle, isPaginated };
+      }
+      const toRender = messages.slice(0, initialCount);
+      const { html } = renderMessageBatch(toRender, showConvTitle, highlightKw);
+      let fullHtml = html;
+      if (isPaginated) {
+        const remaining = messages.length - initialCount;
+        fullHtml += `<div class="load-more-container" id="load-more-container"><button class="load-more-btn" onclick="loadMoreMessages()">加载更多消息（剩余 ${remaining} 条）</button></div>`;
+      }
+      tc.innerHTML = fullHtml;
       addCodeCopyButtons(tc);
-      // 添加消息点击事件，用于显示删除按钮
       addMessageClickHandlers(tc);
-      // 应用字体设置
       applyFont();
+    }
+
+    function loadMoreMessages() {
+      if (!paginationState.isPaginated) return;
+      const { messages, renderedCount, highlightKw, showConvTitle } = paginationState;
+      const nextBatch = messages.slice(renderedCount, renderedCount + PAGE_SIZE);
+      const prevMsg = messages[renderedCount - 1];
+      const lastDate = prevMsg?.time ? formatDateKey(prevMsg.time) : '';
+      const lastConvId = prevMsg?.convId || '';
+      const { html } = renderMessageBatch(nextBatch, showConvTitle, highlightKw, lastDate, lastConvId);
+      const loadMoreEl = document.getElementById('load-more-container');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      addCodeCopyButtons(tempDiv);
+      tempDiv.querySelectorAll('.message.user, .message.assistant').forEach(msg => {
+        msg.addEventListener('click', (e) => {
+          if (e.target.closest('button') || e.target.closest('a')) return;
+          const wasShowing = msg.classList.contains('show-delete');
+          document.querySelectorAll('.message.show-delete').forEach(m => m.classList.remove('show-delete'));
+          if (!wasShowing) msg.classList.add('show-delete');
+        });
+      });
+      while (tempDiv.firstChild) { loadMoreEl.parentNode.insertBefore(tempDiv.firstChild, loadMoreEl); }
+      paginationState.renderedCount += nextBatch.length;
+      const remaining = messages.length - paginationState.renderedCount;
+      if (remaining > 0) {
+        loadMoreEl.querySelector('.load-more-btn').textContent = `加载更多消息（剩余 ${remaining} 条）`;
+      } else {
+        loadMoreEl.remove();
+        paginationState.isPaginated = false;
+      }
+      applyFont();
+    }
+
+    function renderMessagesUpTo(targetIndex) {
+      while (paginationState.isPaginated && paginationState.renderedCount <= targetIndex) {
+        loadMoreMessages();
+      }
     }
     function formatModelName(m) { const mm = { 'gpt-4': 'GPT-4', 'gpt-4o': 'GPT-4o', 'gpt-4o-mini': 'GPT-4o mini', 'gpt-4-turbo': 'GPT-4 Turbo', 'gpt-3.5-turbo': 'GPT-3.5', 'text-davinci-002-render-sha': 'GPT-3.5', 'gpt-4-gizmo': 'GPT-4 (GPTs)', 'o1-preview': 'o1-preview', 'o1-mini': 'o1-mini' }; return mm[m] || m; }
 
@@ -1992,7 +2063,15 @@
     }
 
     function renderChatTimeline() { const nav = document.getElementById('timeline-nav'), dates = [...new Set(currentMessages.filter(m => m.time).map(m => formatDateKey(m.time)))]; if (dates.length <= 1) { nav.classList.remove('show'); return; } nav.innerHTML = dates.map(d => `<button class="timeline-btn" onclick="scrollToDate('${d}')">${formatDateShort(d)}</button>`).join(''); nav.classList.add('show'); }
-    function scrollToDate(ds) { const d = document.getElementById(`date-${ds}`); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    function scrollToDate(ds) {
+      let d = document.getElementById(`date-${ds}`);
+      if (!d && paginationState.isPaginated) {
+        const targetIdx = paginationState.messages.findIndex(m => m.time && formatDateKey(m.time) === ds);
+        if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
+        d = document.getElementById(`date-${ds}`);
+      }
+      if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     
     async function toggleFavorite(msgId, convId, btn) { 
       if (favorites.has(msgId)) { 
@@ -2052,14 +2131,15 @@
           allMessages.splice(msgIndex, 1);
         }
         // 从currentMessages中移除并重新渲染
+        const preserveCount = paginationState.isPaginated ? paginationState.renderedCount : 0;
         currentMessages = currentMessages.filter(m => m.id !== msgId);
         // 如果有收藏也移除
         if (favorites.has(msgId)) {
           favorites.delete(msgId);
           await removeFavoriteFromDb(msgId);
         }
-        // 重新渲染
-        renderMessages(currentMessages);
+        // 重新渲染（保持当前已加载数量）
+        renderMessages(currentMessages, null, false, null, preserveCount);
         renderConversationList();
         showToast('已删除消息');
       } catch (e) {
@@ -2186,7 +2266,12 @@
     function jumpToFavoriteMessage(convId, msgId) {
       openConversation(convId, null, true);
       setTimeout(() => {
-        const el = document.getElementById(`msg-${msgId}`);
+        let el = document.getElementById(`msg-${msgId}`);
+        if (!el && paginationState.isPaginated) {
+          const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
+          if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
+          el = document.getElementById(`msg-${msgId}`);
+        }
         if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); }
       }, 300);
     }
