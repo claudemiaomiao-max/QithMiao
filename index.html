@@ -1686,15 +1686,7 @@
       openConversation(convId, keyword, true);
       document.getElementById('view-global-search').classList.remove('show'); 
       document.getElementById('view-chat').classList.add('show');
-      setTimeout(() => {
-        let el = document.getElementById(`msg-${msgId}`);
-        if (!el && paginationState.isPaginated) {
-          const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
-          if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
-          el = document.getElementById(`msg-${msgId}`);
-        }
-        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); }
-      }, 300);
+      setTimeout(() => scrollToMessage(msgId), 300);
     }
     
     function navigateSearchResult(dir) {
@@ -1710,14 +1702,8 @@
       document.querySelectorAll('.message.highlight').forEach(el => el.classList.remove('highlight'));
       if (currentSearchResultIndex < 0 || currentSearchResultIndex >= flatSearchResults.length) return;
       const r = flatSearchResults[currentSearchResultIndex];
-      let el = document.getElementById(`msg-${r.msgId}`);
-      if (!el && paginationState.isPaginated) {
-        const targetIdx = paginationState.messages.findIndex(m => m.id === r.msgId);
-        if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
-        el = document.getElementById(`msg-${r.msgId}`);
-      }
-      if (el) { el.classList.add('highlight'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       document.getElementById('search-result-count').textContent = `${currentSearchResultIndex + 1} / ${flatSearchResults.length}`;
+      scrollToMessage(r.msgId);
     }
     
     function exitGlobalSearch() { document.getElementById('view-global-search').classList.remove('show'); document.getElementById('view-chat').classList.add('show'); document.getElementById('global-search-info').classList.remove('show'); setSearchMode('current'); }
@@ -1978,9 +1964,52 @@
       applyFont();
     }
 
-    function renderMessagesUpTo(targetIndex) {
-      while (paginationState.isPaginated && paginationState.renderedCount <= targetIndex) {
-        loadMoreMessages();
+    function renderMessagesUpTo(targetIndex, callback) {
+      const neededCount = targetIndex + 50;
+      if (neededCount <= paginationState.renderedCount) { if (callback) callback(); return; }
+      showToast('⏳ 加载中...');
+      setTimeout(() => {
+        const { messages, highlightKw, showConvTitle } = paginationState;
+        const count = Math.min(neededCount, messages.length);
+        const toRender = messages.slice(0, count);
+        const { html } = renderMessageBatch(toRender, showConvTitle, highlightKw);
+        const tc = document.getElementById('chat-messages');
+        const remaining = messages.length - count;
+        let fullHtml = html;
+        if (remaining > 0) {
+          fullHtml += `<div class="load-more-container" id="load-more-container"><button class="load-more-btn" onclick="loadMoreMessages()">加载更多消息（剩余 ${remaining} 条）</button></div>`;
+          paginationState.renderedCount = count;
+          paginationState.isPaginated = true;
+        } else {
+          paginationState.renderedCount = messages.length;
+          paginationState.isPaginated = false;
+        }
+        tc.innerHTML = fullHtml;
+        addCodeCopyButtons(tc);
+        addMessageClickHandlers(tc);
+        applyFont();
+        if (callback) callback();
+      }, 10);
+    }
+
+    function scrollToMessage(msgId, highlight = true) {
+      let el = document.getElementById(`msg-${msgId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (highlight) { el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); }
+        return;
+      }
+      if (paginationState.isPaginated) {
+        const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
+        if (targetIdx >= 0) {
+          renderMessagesUpTo(targetIdx, () => {
+            const el2 = document.getElementById(`msg-${msgId}`);
+            if (el2) {
+              el2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              if (highlight) { el2.classList.add('highlight'); setTimeout(() => el2.classList.remove('highlight'), 3000); }
+            }
+          });
+        }
       }
     }
     function formatModelName(m) { const mm = { 'gpt-4': 'GPT-4', 'gpt-4o': 'GPT-4o', 'gpt-4o-mini': 'GPT-4o mini', 'gpt-4-turbo': 'GPT-4 Turbo', 'gpt-3.5-turbo': 'GPT-3.5', 'text-davinci-002-render-sha': 'GPT-3.5', 'gpt-4-gizmo': 'GPT-4 (GPTs)', 'o1-preview': 'o1-preview', 'o1-mini': 'o1-mini' }; return mm[m] || m; }
@@ -2065,12 +2094,16 @@
     function renderChatTimeline() { const nav = document.getElementById('timeline-nav'), dates = [...new Set(currentMessages.filter(m => m.time).map(m => formatDateKey(m.time)))]; if (dates.length <= 1) { nav.classList.remove('show'); return; } nav.innerHTML = dates.map(d => `<button class="timeline-btn" onclick="scrollToDate('${d}')">${formatDateShort(d)}</button>`).join(''); nav.classList.add('show'); }
     function scrollToDate(ds) {
       let d = document.getElementById(`date-${ds}`);
-      if (!d && paginationState.isPaginated) {
+      if (d) { d.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+      if (paginationState.isPaginated) {
         const targetIdx = paginationState.messages.findIndex(m => m.time && formatDateKey(m.time) === ds);
-        if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
-        d = document.getElementById(`date-${ds}`);
+        if (targetIdx >= 0) {
+          renderMessagesUpTo(targetIdx, () => {
+            const d2 = document.getElementById(`date-${ds}`);
+            if (d2) d2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
       }
-      if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
     async function toggleFavorite(msgId, convId, btn) { 
@@ -2265,15 +2298,7 @@
     
     function jumpToFavoriteMessage(convId, msgId) {
       openConversation(convId, null, true);
-      setTimeout(() => {
-        let el = document.getElementById(`msg-${msgId}`);
-        if (!el && paginationState.isPaginated) {
-          const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
-          if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
-          el = document.getElementById(`msg-${msgId}`);
-        }
-        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); }
-      }, 300);
+      setTimeout(() => scrollToMessage(msgId), 300);
     }
     
     function renderCalendar() {
@@ -2873,19 +2898,7 @@
       
       // 打开对话并定位到那条消息
       openConversation(convId, null, true);
-      setTimeout(() => {
-        let el = document.getElementById(`msg-${msgId}`);
-        if (!el && paginationState.isPaginated) {
-          const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
-          if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
-          el = document.getElementById(`msg-${msgId}`);
-        }
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('highlight');
-          setTimeout(() => el.classList.remove('highlight'), 3000);
-        }
-      }, 300);
+      setTimeout(() => scrollToMessage(msgId), 300);
       
       // 显示提示
       const timeStr = randomMsg.time ? formatFullDateTime(randomMsg.time) : '';
