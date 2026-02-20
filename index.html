@@ -916,6 +916,41 @@
     .msg-delete-x:hover { background: var(--danger); color: white; }
     .message.show-delete .msg-delete-x { display: flex; }
 
+    /* 触屏设备：禁用hover效果，解决Safari双击问题 */
+    @media (hover: none) and (pointer: coarse) {
+      .conv-item:hover { border-color: transparent; }
+      .conv-item:hover .conv-delete-btn { display: none; }
+      .drawer-menu-item:hover { background: transparent; }
+      .drawer-menu-item.danger:hover { background: transparent; }
+      .conv-action-btn:hover { background: var(--bg); border-color: var(--border); }
+      .conv-action-btn.danger:hover { background: transparent; border-color: var(--border); }
+      .header-btn:hover { background: transparent; }
+      .upload-btn:hover { transform: none; box-shadow: none; }
+      .star-btn:hover { opacity: 1; }
+      .search-result-item:hover { border-color: var(--border); }
+      .fav-action-btn:hover { background: var(--bg); border-color: var(--border); }
+      .fav-action-btn.export:hover { background: var(--primary); }
+      .fav-action-btn.danger:hover { background: transparent; }
+      .fav-jump-btn:hover { background: transparent; border-color: var(--border); color: var(--text-light); }
+      .conv-delete-btn:hover { background: transparent; color: var(--text-light); }
+      .export-format-btn:hover { border-color: var(--border); background: var(--bg); }
+      .collapse-btn:hover { background: transparent; color: var(--text-light); }
+      .search-mode-btn:hover { border-color: var(--border); }
+      .search-nav-btn:hover { background: var(--primary-light); color: var(--primary); }
+      .timeline-btn:hover { background: var(--bg); border-color: var(--border); }
+      .month-nav button:hover { background: var(--bg); border-color: var(--border); }
+      .global-search-back:hover { background: transparent; }
+      .pattern-option:hover { border-color: var(--border); transform: none; }
+      .theme-dot:hover { transform: none; }
+      .chart-toggle-btn:hover { color: var(--text-light); }
+      .calendar-day:hover { transform: none; }
+    }
+    /* Safari工具栏收起时fixed遮罩高度修复 */
+    @supports (-webkit-touch-callout: none) {
+      .drawer { height: 100dvh; }
+      .drawer-overlay { height: 100dvh; }
+      .modal-overlay { height: 100dvh; }
+    }
   </style>
 </head>
 <body>
