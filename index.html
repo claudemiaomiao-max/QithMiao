@@ -946,6 +946,10 @@
           <span class="format-icon">📋</span>
           <span class="format-info"><div class="format-name">JSON (.json)</div><div class="format-desc">完整数据，可重新导入</div></span>
         </button>
+        <button class="export-format-btn" onclick="doExportConversations('md')">
+          <span class="format-icon">📝</span>
+          <span class="format-info"><div class="format-name">Markdown (.md)</div><div class="format-desc">带格式排版，适合归档阅读</div></span>
+        </button>
         <button class="export-format-btn" onclick="doExportConversations('txt')">
           <span class="format-icon">📄</span>
           <span class="format-info"><div class="format-name">纯文本 (.txt)</div><div class="format-desc">方便阅读和分享</div></span>
@@ -1780,6 +1784,19 @@
       if (format === 'json') {
         const ds = JSON.stringify(sc, null, 2);
         downloadFile(ds, `conversations_${sc.length}_${timestamp}.json`, 'application/json');
+      } else if (format === 'md') {
+        let et = `# 对话导出\n\n> 导出时间: ${new Date().toLocaleString('zh-CN')}  \n> 共 ${sc.length} 个对话\n\n---\n\n`;
+        sc.forEach(conv => {
+          const messages = parseMessages(conv.mapping, conv.current_node);
+          et += `## 📚 ${conv.title || '未命名对话'}\n\n`;
+          messages.forEach(msg => {
+            if (msg.type === 'custom_instructions' || msg.type === 'memory_update' || msg.type === 'memory_call') return;
+            const role = msg.role === 'user' ? `🦜 ${userName}` : `🤖 ${aiName}`;
+            const time = msg.time ? formatFullDateTime(msg.time) : '';
+            et += `### ${role} ${time}\n\n${msg.content}\n\n---\n\n`;
+          });
+        });
+        downloadFile(et, `conversations_${sc.length}_${timestamp}.md`, 'text/markdown;charset=utf-8');
       } else if (format === 'txt') {
         let et = `对话导出\n导出时间: ${new Date().toLocaleString('zh-CN')}\n共 ${sc.length} 个对话\n${'='.repeat(50)}\n`;
         sc.forEach(conv => {
