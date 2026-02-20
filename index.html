@@ -2874,7 +2874,12 @@
       // 打开对话并定位到那条消息
       openConversation(convId, null, true);
       setTimeout(() => {
-        const el = document.getElementById(`msg-${msgId}`);
+        let el = document.getElementById(`msg-${msgId}`);
+        if (!el && paginationState.isPaginated) {
+          const targetIdx = paginationState.messages.findIndex(m => m.id === msgId);
+          if (targetIdx >= 0) renderMessagesUpTo(targetIdx);
+          el = document.getElementById(`msg-${msgId}`);
+        }
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el.classList.add('highlight');
