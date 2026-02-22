@@ -272,7 +272,7 @@
     .title-icon-fill { width: 24px; height: 24px; fill: var(--star-active); stroke: none; vertical-align: middle; margin-right: 6px; }
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s; }
     .loading-overlay.show { opacity: 1; visibility: visible; }
-    .loading-spinner { width: 50px; height: 50px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    .loading-spinner { width: 50px; height: 50px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { margin-top: 16px; color: var(--text); font-size: var(--font-size-base); }
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9998; opacity: 0; visibility: hidden; transition: all 0.3s; }
@@ -1549,10 +1549,12 @@
         if (allConversations.length > 0) { 
           processAllConversations(); 
           document.getElementById('view-upload').style.display = 'none'; 
-          const lastConvId = getLastViewedConv();
-          const lastConv = lastConvId ? allConversations.find(c => c.id === lastConvId) : null;
-          if (lastConv) { openConversation(lastConvId); } 
-          else if (filteredConversations.length > 0) { openConversation(filteredConversations[0].id); }
+          // 不自动加载上次的对话，避免长对话卡死页面
+          // 显示聊天视图但带提示，等用户自己选择对话
+          renderConversationList();
+          document.getElementById('view-chat').classList.add('show');
+          document.getElementById('chat-title').textContent = '选择一个对话';
+          document.getElementById('chat-messages').innerHTML = '<div class="empty-state"><div class="icon">💬</div><p>点击左上角 ☰ 选择要查看的对话~</p></div>';
         } 
         favorites = await getAllFavoritesFromDb(); 
       } catch (e) { console.error('加载数据失败', e); } 
@@ -2860,7 +2862,7 @@
       switch(view) { 
         case 'conversations': 
           if (currentConvId) document.getElementById('view-chat').classList.add('show'); 
-          else if (allConversations.length > 0) openConversation(allConversations[0].id); 
+          else if (allConversations.length > 0) { document.getElementById('view-chat').classList.add('show'); document.getElementById('chat-title').textContent = '选择一个对话'; document.getElementById('chat-messages').innerHTML = '<div class="empty-state"><div class="icon">💬</div><p>点击左上角 ☰ 选择要查看的对话~</p></div>'; }
           else document.getElementById('view-upload').style.display = 'flex'; 
           break; 
         case 'chat': document.getElementById('view-chat').classList.add('show'); break; 
