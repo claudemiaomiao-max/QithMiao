@@ -257,13 +257,15 @@
       --line-height: 1.7;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { background: var(--bg); }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: var(--bg);
       color: var(--text);
       overflow: hidden;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      margin: 0;
+      width: 100vw; width: 100lvw;
+      height: 100vh; height: 100lvh;
     }
     .font-decorative { font-family: 'Malvides', cursive; font-size: 1.2rem; }
     .icon-svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -271,13 +273,13 @@
     .drawer-menu-item .icon-svg { width: 22px; height: 22px; }
     .title-icon { width: 24px; height: 24px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; vertical-align: middle; margin-right: 6px; }
     .title-icon-fill { width: 24px; height: 24px; fill: var(--star-active); stroke: none; vertical-align: middle; margin-right: 6px; }
-    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s; }
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; width: 100lvw; height: 100vh; height: 100lvh; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s; }
     .loading-overlay.show { opacity: 1; visibility: visible; }
     .loading-spinner { width: 50px; height: 50px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { margin-top: 16px; color: var(--text); font-size: var(--font-size-base); }
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9998; opacity: 0; visibility: hidden; transition: all 0.3s; }
-    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; width: 100lvw; height: 100vh; height: 100lvh; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9998; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay.show { display: flex; opacity: 1; }
     .modal { background: var(--bg-card); border-radius: 16px; padding: 24px; max-width: 320px; width: 90%; text-align: center; transform: scale(0.9); transition: transform 0.3s; }
     .modal-overlay.show .modal { transform: scale(1); }
     .modal-icon { font-size: 3rem; margin-bottom: 12px; }
@@ -391,9 +393,9 @@
     .header-logo { font-size: 1.4rem; font-weight: 600; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.1); letter-spacing: 0.5px; white-space: nowrap; font-family: "fagun", -apple-system, BlinkMacSystemFont, sans-serif; }
     @media (max-width: 380px) { .header-logo { font-size: 0.95rem; } }
     .drawer-header h2 { font-family: "fagun", -apple-system, BlinkMacSystemFont, sans-serif; }
-    .drawer-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.3s; }
-    .drawer-overlay.show { opacity: 1; visibility: visible; }
-    .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 300px; max-width: 85vw; background: var(--bg-card); z-index: 1002; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
+    .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; width: 100lvw; height: 100vh; height: 100lvh; background: rgba(0,0,0,0.4); z-index: 1001; display: none; transition: opacity 0.3s; opacity: 0; }
+    .drawer-overlay.show { display: block; opacity: 1; }
+    .drawer { position: fixed; top: 0; left: 0; width: 300px; max-width: 85vw; height: 100vh; height: 100lvh; background: var(--bg-card); z-index: 1002; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
     .drawer.show { transform: translateX(0); }
     .drawer-header { padding: 16px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
     .drawer-header h2 { font-size: 1.1rem; font-weight: 500; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
@@ -430,7 +432,7 @@
     .conv-delete-btn { width: 24px; height: 24px; border: none; background: transparent; color: var(--text-light); border-radius: 6px; cursor: pointer; display: none; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 1rem; }
     .conv-item:hover .conv-delete-btn { display: flex; }
     .conv-delete-btn:hover { background: var(--danger-light); color: var(--danger); }
-    .main-content { position: fixed; top: 56px; left: 0; right: 0; bottom: 0; background: var(--bg); overflow: hidden; }
+    .main-content { position: fixed; top: 56px; left: 0; right: 0; height: calc(100vh - 56px); height: calc(100lvh - 56px); background: var(--bg); overflow: hidden; }
     .view-upload { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; }
     .upload-box { background: var(--bg-card); border-radius: 24px; padding: 50px 40px; text-align: center; border: 3px dashed var(--primary-light); max-width: 400px; width: 100%; transition: all 0.3s; }
     .upload-box.dragover { border-color: var(--primary); background: var(--primary-light); }
