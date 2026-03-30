@@ -262,7 +262,9 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
     .font-decorative { font-family: 'Malvides', cursive; font-size: 1.2rem; }
     .icon-svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -392,7 +394,7 @@
     .drawer-header h2 { font-family: "fagun", -apple-system, BlinkMacSystemFont, sans-serif; }
     .drawer-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.3s; }
     .drawer-overlay.show { opacity: 1; visibility: visible; }
-    .drawer { position: fixed; top: 0; left: 0; width: 300px; max-width: 85vw; height: 100%; background: var(--bg-card); z-index: 1002; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
+    .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 300px; max-width: 85vw; background: var(--bg-card); z-index: 1002; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
     .drawer.show { transform: translateX(0); }
     .drawer-header { padding: 16px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
     .drawer-header h2 { font-size: 1.1rem; font-weight: 500; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
