@@ -257,15 +257,16 @@
       --line-height: 1.7;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { background: var(--bg); }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: var(--bg);
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      background: var(--bg);
       color: var(--text);
       overflow: hidden;
-      margin: 0;
-      width: 100vw; width: 100lvw;
-      height: 100vh; height: 100lvh;
     }
     .font-decorative { font-family: 'Malvides', cursive; font-size: 1.2rem; }
     .icon-svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -1359,7 +1360,7 @@
     function getLastViewedConv() { try { return localStorage.getItem('lastViewedConvId'); } catch (e) { return null; } }
     
     function applySettings() {
-      if (appSettings.theme === 'pink') document.body.removeAttribute('data-theme'); else document.body.setAttribute('data-theme', appSettings.theme);
+      if (appSettings.theme === 'pink') { document.body.removeAttribute('data-theme'); document.documentElement.removeAttribute('data-theme'); } else { document.body.setAttribute('data-theme', appSettings.theme); document.documentElement.setAttribute('data-theme', appSettings.theme); }
       // 处理字体大小（支持旧的 small/medium/large 格式和新的数字格式）
       if (typeof appSettings.fontSize === 'string') {
         const sizeMap = { 'small': 12, 'medium': 14, 'large': 18 };
@@ -1540,7 +1541,7 @@
       document.getElementById('settings-overlay').classList.add('show'); toggleDrawer(false);
     }
     function closeSettings() { document.getElementById('settings-overlay').classList.remove('show'); }
-    function selectTheme(theme) { document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === theme)); appSettings.theme = theme; if (theme === 'pink') document.body.removeAttribute('data-theme'); else document.body.setAttribute('data-theme', theme); applyPattern(); if (chartMode === 'linechart') renderLineChart(); }
+    function selectTheme(theme) { document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === theme)); appSettings.theme = theme; if (theme === 'pink') { document.body.removeAttribute('data-theme'); document.documentElement.removeAttribute('data-theme'); } else { document.body.setAttribute('data-theme', theme); document.documentElement.setAttribute('data-theme', theme); } applyPattern(); if (chartMode === 'linechart') renderLineChart(); }
     function selectFontSizeBySlider(size) {
       // 只更新设置值，不立即应用，等保存时才应用
       appSettings.fontSize = parseInt(size);
