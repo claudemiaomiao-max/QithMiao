@@ -257,11 +257,13 @@
       --line-height: 1.7;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { height: 100%; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
     }
     .font-decorative { font-family: 'Malvides', cursive; font-size: 1.2rem; }
@@ -959,11 +961,11 @@
       .chart-toggle-btn:hover { color: var(--text-light); }
       .calendar-day:hover { transform: none; }
     }
-    /* Safari工具栏收起时fixed遮罩高度修复 */
+    /* Safari视口高度修复 */
     @supports (-webkit-touch-callout: none) {
-      .drawer { height: 100dvh; }
-      .drawer-overlay { height: 100dvh; }
-      .modal-overlay { height: 100dvh; }
+      .drawer { height: 100vh; height: 100dvh; height: -webkit-fill-available; top: 0; bottom: 0; }
+      .drawer-overlay { top: 0; bottom: 0; left: 0; right: 0; height: auto; min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available; }
+      .modal-overlay { height: 100vh; height: 100dvh; height: -webkit-fill-available; }
     }
   </style>
 </head>
@@ -1587,7 +1589,7 @@
     function handleSearch() {
       const keyword = document.getElementById('search-input').value.toLowerCase().trim();
       currentSearchKeyword = keyword;
-      if (!keyword) { document.getElementById('global-search-info').classList.remove('show'); document.querySelectorAll('.message.highlight').forEach(el => el.classList.remove('highlight')); flatSearchResults = []; currentSearchResultIndex = -1; if (searchMode === 'global') { document.getElementById('view-global-search').classList.remove('show'); document.getElementById('view-chat').classList.add('show'); setSearchMode('current'); } if (currentMessages.length > 0) renderMessages(currentMessages); return; }
+      if (!keyword) { currentSearchKeyword = ''; document.querySelectorAll('.message.highlight').forEach(el => el.classList.remove('highlight')); flatSearchResults = []; currentSearchResultIndex = -1; if (searchMode === 'global') { document.getElementById('view-global-search').classList.remove('show'); document.getElementById('view-chat').classList.add('show'); setSearchMode('current'); } if (currentConvId) { openConversation(currentConvId); } return; }
       if (searchMode === 'current') performCurrentSearch(keyword); else performGlobalSearch(keyword);
     }
     
