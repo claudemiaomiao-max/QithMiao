@@ -262,9 +262,7 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      min-height: 100dvh;
       overflow-x: hidden;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
     .font-decorative { font-family: 'Malvides', cursive; font-size: 1.2rem; }
     .icon-svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -416,7 +414,7 @@
     .conv-search input { width: 100%; padding: 8px 12px; border: 2px solid var(--border); border-radius: 10px; font-size: var(--font-size-small); outline: none; transition: all 0.2s; background: var(--bg); color: var(--text); }
     .conv-search input:focus { border-color: var(--primary); }
     .conv-search input::placeholder { color: var(--text-light); }
-    .drawer-conversations { flex: 1; overflow-y: auto; padding: 8px 10px; padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+    .drawer-conversations { flex: 1; overflow-y: auto; padding: 8px 10px; }
     .conv-item, .conv-checkbox, .conv-action-btn, .drawer-menu-item, .star-btn, .export-format-btn, .fav-msg-checkbox, .fav-action-btn, .msg-copy-btn, .fav-jump-btn, .modal-btn, .conv-delete-btn, .message-bubble, .search-result-item, .header-btn, .upload-btn { touch-action: manipulation; }
     .conv-item { padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; background: var(--bg); display: flex; align-items: flex-start; gap: 8px; }
     .conv-item:hover { border-color: var(--primary-light); }
@@ -477,7 +475,7 @@
     .timeline-btn:hover { background: var(--primary-light); border-color: var(--primary); }
     
     /* 聊天消息区域背景 */
-    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--bg); position: relative; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); position: relative; }
     
     /* 背景图案样式 */
     .chat-messages[data-pattern="grid"] {
